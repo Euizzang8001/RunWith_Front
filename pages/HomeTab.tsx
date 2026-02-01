@@ -1,13 +1,16 @@
 import { colors } from '@/constants';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TodayDate from './TodayDate';
-
-export default function FeedItem() {
+import TodayDate from '../components/TodayDate';
+export default function HomeTab() {
   return (
     <SafeAreaView>
       <View style={styles.container_top}>
-        <Text style={styles.header}>오늘의 목표</Text>
+        <View style={styles.bell_icon}>
+          <Text style={styles.header}>오늘의 목표</Text>
+          <FontAwesome5 name="bell" size={24} color="black" />
+        </View>
         <Text style={styles.date}>
           <TodayDate />
         </Text>
@@ -27,8 +30,14 @@ export default function FeedItem() {
 }
 
 const styles = StyleSheet.create({
+  bell_icon: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 10,
+  },
   header: {
-    paddingLeft: 20,
     marginTop: 50,
     fontSize: 18,
     fontFamily: 'pretendard500',
@@ -54,11 +63,11 @@ const styles = StyleSheet.create({
   item: {
     gap: 10,
     borderRadius: 24,
-    backgroundColor: '#dfdfdf',
+    backgroundColor: colors.WHITE_BACKGROUND,
     maxWidth: 400,
     maxHeight: 500,
     shadowColor: colors.BLACK,
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
 

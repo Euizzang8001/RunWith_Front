@@ -1,6 +1,6 @@
-import FeedItem from '@/components/FeedItem';
+import HomeTab from '@/pages/HomeTab';
 
 // 인덱스 페이지
 export default function HomeScreen() {
-  return <FeedItem />;
+  return <HomeTab />;
 }

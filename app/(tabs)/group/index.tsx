@@ -1,12 +1,5 @@
-import { Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import GroupTab from '@/pages/GroupTab';
 
 export default function GroupScreen() {
-  return (
-    <SafeAreaView>
-      <View>
-        <Text>그룹</Text>
-      </View>
-    </SafeAreaView>
-  );
+  return <GroupTab />;
 }

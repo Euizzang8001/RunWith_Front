@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { setCustomText } from 'react-native-global-props';
 import 'react-native-reanimated';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -48,35 +49,37 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: false,
-        }}
-      />
+    <SafeAreaProvider>
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
 
-      <Stack.Screen
-        name="(tabs)"
-        options={{
-          headerShown: false,
-          contentStyle: {
-            backgroundColor: colors.WHITE,
-          },
-        }}
-      />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+            contentStyle: {
+              backgroundColor: colors.WHITE,
+            },
+          }}
+        />
 
-      <Stack.Screen
-        name="auth"
-        options={{
-          headerShown: false,
-        }}
-      />
+        <Stack.Screen
+          name="auth"
+          options={{
+            headerShown: false,
+          }}
+        />
 
-      <Stack.Screen
-        name="modal"
-        options={{ presentation: 'modal', title: 'Modal' }}
-      />
-    </Stack>
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: 'modal', title: 'Modal' }}
+        />
+      </Stack>
+    </SafeAreaProvider>
   );
 }
