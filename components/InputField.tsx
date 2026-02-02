@@ -18,7 +18,7 @@ export default function InputField({
   ...props
 }: InputField) {
   return (
-    <View>
+    <View style={styles.wrapper}>
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={[styles.container, styles[variant]]}>
         <TextInput style={styles.input} {...props} />
@@ -28,16 +28,19 @@ export default function InputField({
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    width: '87%',
+    alignSelf: 'center',
+  },
   label: {
     fontSize: 14,
     color: colors.BLACK,
     marginBottom: 5,
-    paddingLeft: 3,
   },
 
   container: {
-    margin: 'auto',
-    width: '87%',
+    alignSelf: 'center',
+    width: '100%',
     height: 57,
     paddingHorizontal: 10,
     borderRadius: 12,

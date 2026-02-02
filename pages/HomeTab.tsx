@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import TodayDate from '../components/TodayDate';
 export default function HomeTab() {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ backgroundColor: colors.WHITE_BACKGROUND, flex: 1 }}>
       <View style={styles.container_top}>
         <View style={styles.bell_icon}>
           <Text style={styles.header}>오늘의 목표</Text>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   item: {
     gap: 10,
     borderRadius: 24,
-    backgroundColor: colors.WHITE_BACKGROUND,
+    backgroundColor: colors.WHITE,
     maxWidth: 400,
     maxHeight: 500,
     shadowColor: colors.BLACK,

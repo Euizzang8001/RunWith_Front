@@ -20,14 +20,16 @@ export default function GroupTab() {
         </View>
       </Pressable>
 
-      <View style={styles.container}>
-        <View style={styles.item}>
-          <View style={styles.info}>
-            <Text style={styles.title}>수학 공부 Team</Text>
-            <Text style={styles.headCount}>3 / 10 명</Text>
+      <Pressable onPress={() => router.push('/(tabs)/group/groupDetail')}>
+        <View style={styles.container}>
+          <View style={styles.item}>
+            <View style={styles.info}>
+              <Text style={styles.title}>수학 공부 Team</Text>
+              <Text style={styles.headCount}>3 / 10 명</Text>
+            </View>
           </View>
         </View>
-      </View>
+      </Pressable>
     </SafeAreaView>
   );
 }
