@@ -12,7 +12,7 @@ export default function CustomButton({
   label,
   size = 'large',
   variant = 'filled',
-  textVariant,
+  textVariant = 'textFilled',
   ...props
 }: CustomButtonProps) {
   return (
@@ -25,7 +25,7 @@ export default function CustomButton({
       ]}
       {...props}
     >
-      <Text style={styles[textVariant!]}>{label}</Text>
+      <Text style={styles[textVariant]}>{label}</Text>
     </Pressable>
   );
 }
