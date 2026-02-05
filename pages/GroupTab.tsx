@@ -1,4 +1,4 @@
-import { colors } from '@/constants';
+import GroupList from '@/components/GroupList';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -19,17 +19,7 @@ export default function GroupTab() {
           <EvilIcons name="plus" size={40} color="black" />
         </View>
       </Pressable>
-
-      <Pressable onPress={() => router.push('/(tabs)/group/groupDetail')}>
-        <View style={styles.container}>
-          <View style={styles.item}>
-            <View style={styles.info}>
-              <Text style={styles.title}>수학 공부 Team</Text>
-              <Text style={styles.headCount}>3 / 10 명</Text>
-            </View>
-          </View>
-        </View>
-      </Pressable>
+      <GroupList />
     </SafeAreaView>
   );
 }
@@ -48,32 +38,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingRight: 30,
-  },
-
-  container: {
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 16,
-    fontFamily: 'pretendard300',
-  },
-  headCount: {
-    color: colors.GRAY_FONT,
-  },
-  item: {
-    gap: 10,
-    borderRadius: 24,
-    backgroundColor: colors.WHITE_BACKGROUND,
-    borderColor: colors.BLUE,
-    borderWidth: 1,
-    maxWidth: 400,
-    maxHeight: 500,
-  },
-  info: {
-    gap: 10,
-    padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
 });

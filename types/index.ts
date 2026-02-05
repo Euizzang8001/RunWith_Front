@@ -74,15 +74,42 @@ interface Post {
   scheduleTime: string;
 }
 
+interface GroupItem {
+  id: number;
+  userId: number;
+  title: string;
+  description: string;
+  createdAt: string;
+  nickname: string;
+  author: User;
+}
+
+interface GroupList {
+  id: number;
+  participants: number;
+  capacity: number;
+  title: string;
+}
+
+interface Schedule {
+  id: string;
+  title: string;
+  date: string;
+  scheduleTime: string;
+}
+
 export type {
   Comment,
   CreateCommentDto,
   CreatePostDto,
   CreateVoteDto,
+  GroupItem,
+  GroupList,
   ImageUri,
   Post,
   PostVote,
   PostVoteOption,
   Profile,
+  Schedule,
   VoteOption,
 };
