@@ -1,4 +1,4 @@
-import CalendarScreen from '@/components/CalendarScreen';
+import CalendarScreen from '@/components/Calendar/CalendarScreen';
 import { Schedule } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';

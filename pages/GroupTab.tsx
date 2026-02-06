@@ -1,4 +1,4 @@
-import GroupList from '@/components/GroupList';
+import GroupList from '@/components/Group/GroupList';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';

@@ -1,4 +1,4 @@
-import FeedList from '@/components/FeedList';
+import FeedList from '@/components/Feed/FeedList';
 import { View } from 'react-native';
 import HomeHeader from './HomeHeader';
 export default function HomeTab() {
