@@ -48,12 +48,12 @@ interface CreateVoteDto {
 type PostVoteOption = VoteOption & { userVotes: { userId: number }[] };
 
 interface PostVote {
-  id: number;
+  id: string;
   title: string;
   options: PostVoteOption[];
 }
 interface Comment {
-  id: number;
+  id: string;
   content: string;
   createdAt: string;
   user: User;
@@ -65,7 +65,7 @@ interface PostComment extends Comment {
 }
 
 interface Post {
-  id: number;
+  id: string;
   userId: number;
   title: string;
   description: string;
@@ -75,7 +75,7 @@ interface Post {
 }
 
 interface GroupItem {
-  id: number;
+  id: string;
   userId: number;
   title: string;
   description: string;
@@ -85,8 +85,8 @@ interface GroupItem {
 }
 
 interface GroupList {
-  id: number;
-  participants: number;
+  id: string;
+  participants: string[];
   capacity: number;
   title: string;
 }

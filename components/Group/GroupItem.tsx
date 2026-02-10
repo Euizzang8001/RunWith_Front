@@ -8,14 +8,25 @@ type GroupListProps = {
 };
 
 export default function GroupItem({ group }: GroupListProps) {
+  const currentCount = group.participants.length;
+
   return (
-    <Pressable onPress={() => router.push('/(tabs)/group/groupDetail')}>
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: '/(tabs)/group/groupDetail',
+          params: {
+            groupId: group.id,
+          },
+        })
+      }
+    >
       <View style={styles.container}>
         <View style={styles.item}>
           <View style={styles.info}>
             <Text style={styles.title}>{group.title}</Text>
             <Text style={styles.headCount}>
-              {group.participants} / {group.capacity} 명
+              {currentCount} / {group.capacity} 명
             </Text>
           </View>
         </View>
