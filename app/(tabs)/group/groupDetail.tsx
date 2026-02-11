@@ -1,19 +1,42 @@
 import { colors } from '@/constants';
 import { dummyGroups } from '@/mocks/groups';
+import { dummy_schedules } from '@/mocks/schedule';
 import { dummyUsers } from '@/mocks/users';
+import { Schedule } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function GroupDetail() {
+  const today = new Date().toLocaleDateString('sv-SE');
+
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(
+    null,
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
 
   const group = dummyGroups.find((item) => String(item.id) === groupId);
+
+  const goToGroupOption = () => {
+    router.push('/(tabs)/group/groupOptions');
+  };
+
+  const selectedUserSchedules = useMemo(() => {
+    if (!selectedUser) return [];
+
+    return dummy_schedules.filter(
+      (schedule) =>
+        schedule.runnerId === selectedUser &&
+        schedule.date === today &&
+        schedule.isSelf === false,
+    );
+  }, [selectedUser, today]);
 
   const members = useMemo(() => {
     if (!group) return [];
@@ -34,9 +57,11 @@ export default function GroupDetail() {
       <View style={styles.header}>
         <View style={styles.leftSpace}></View>
         <Text style={styles.title}>{group.title}</Text>
-        <View style={styles.icon}>
-          <Ionicons name="menu-outline" size={32} color="black" />
-        </View>
+        <Pressable onPress={goToGroupOption}>
+          <View style={styles.icon}>
+            <Ionicons name="menu-outline" size={32} color="black" />
+          </View>
+        </Pressable>
       </View>
 
       <View style={styles.user_icon_Wrapper}>
@@ -54,16 +79,54 @@ export default function GroupDetail() {
           );
         })}
       </View>
-      <View>
+      <View style={styles.text_container}>
         {selectedUser !== null ? (
           <View>
-            <Text>{seletedUser}의 스케줄</Text>
+            <Text style={styles.seletedUserText}>{seletedUser}</Text>
+
+            {selectedUserSchedules.length > 0 ? (
+              selectedUserSchedules.map((schedule) => (
+                <Pressable
+                  onPress={() => {
+                    setSelectedSchedule(schedule);
+                    setIsModalOpen(true);
+                  }}
+                  style={styles.schedule_container}
+                  key={schedule.id}
+                >
+                  <Text>{schedule.title}</Text>
+                  <Text>{schedule.scheduleTime}</Text>
+                </Pressable>
+              ))
+            ) : (
+              <Text style={styles.noScheduleDay}> 오늘 일정이 없습니다. </Text>
+            )}
           </View>
         ) : (
           <View>
-            <Text>일정을 확인하고 싶은 그룹의 멤버를 선택하세요.</Text>
+            <Text>일정을 확인하고 싶은 멤버를 선택하세요.</Text>
           </View>
         )}
+        <Modal
+          visible={isModalOpen}
+          animationType="slide"
+          onRequestClose={() => setIsModalOpen(false)}
+        >
+          <View>
+            <View>
+              {selectedSchedule && (
+                <View>
+                  <Text>{selectedSchedule.title}</Text>
+                  <Text>{selectedSchedule.scheduleTime}</Text>
+
+                  <Pressable onPress={() => setIsModalOpen(false)}>
+                    <Text>X</Text>
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );
@@ -109,5 +172,26 @@ const styles = StyleSheet.create({
   userSelcetd: {
     borderWidth: 2,
     borderColor: colors.BLUE,
+  },
+  text_container: {
+    marginTop: 50,
+    marginLeft: 40,
+    marginRight: 40,
+  },
+  seletedUserText: {
+    fontFamily: 'pretendard500',
+    fontSize: 16,
+  },
+  schedule_container: {
+    marginTop: 30,
+    backgroundColor: colors.GRAY,
+    padding: 20,
+    borderRadius: 16,
+    gap: 10,
+  },
+  noScheduleDay: {
+    marginTop: 30,
+    width: '100%',
+    textAlign: 'center',
   },
 });

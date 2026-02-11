@@ -82,6 +82,8 @@ export default function CalendarView({
 
   const handleAddSchedule = () => {
     addSchedules({
+      runnerId: '1',
+      isSelf: true,
       date: selected,
       title: TitleInput,
       scheduleTime: `${startTime} ~ ${endTime}`,
@@ -172,15 +174,17 @@ export default function CalendarView({
                 </View>
               )}
               ListEmptyComponent={
-                <View>
-                  <Text>{selected && '일정이 없습니다.'}</Text>
+                <View style={styles.add_container}>
+                  <Text style={styles.noSchedule}>
+                    {selected && '일정이 없습니다.'}
+                  </Text>
                   <Pressable
                     onPress={() => {
                       setIsScheduleOpen(false);
                       setisAddModalOpen(true);
                     }}
                   >
-                    <Text>일정 추가</Text>
+                    <Text style={styles.addSchedule}>일정 추가</Text>
                   </Pressable>
                 </View>
               }
@@ -336,5 +340,22 @@ const styles = StyleSheet.create({
     borderColor: colors.RED,
     padding: 20,
     borderRadius: 24,
+  },
+  add_container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  addSchedule: {
+    fontSize: 16,
+    fontFamily: 'pretendard500',
+    borderRadius: 12,
+    backgroundColor: colors.BLUE,
+    color: colors.WHITE,
+    padding: 10,
+  },
+  noSchedule: {
+    fontSize: 16,
+    fontFamily: 'pretnedard500',
   },
 });
