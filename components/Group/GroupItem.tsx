@@ -8,7 +8,7 @@ type GroupListProps = {
 };
 
 export default function GroupItem({ group }: GroupListProps) {
-  const currentCount = group.participants.length;
+  const currentCount = group?.participants?.length;
 
   return (
     <Pressable
@@ -24,7 +24,7 @@ export default function GroupItem({ group }: GroupListProps) {
       <View style={styles.container}>
         <View style={styles.item}>
           <View style={styles.info}>
-            <Text style={styles.title}>{group.title}</Text>
+            <Text style={styles.title}>{group.name}</Text>
             <Text style={styles.headCount}>
               {currentCount} / {group.capacity} 명
             </Text>

@@ -24,7 +24,12 @@ export default function GroupDetail() {
   const group = dummyGroups.find((item) => String(item.id) === groupId);
 
   const goToGroupOption = () => {
-    router.push('/(tabs)/group/groupOptions');
+    router.push({
+      pathname: '/(tabs)/group/groupOptions',
+      params: {
+        groupId: group?.id,
+      },
+    });
   };
 
   const selectedUserSchedules = useMemo(() => {
@@ -56,7 +61,7 @@ export default function GroupDetail() {
     <SafeAreaView>
       <View style={styles.header}>
         <View style={styles.leftSpace}></View>
-        <Text style={styles.title}>{group.title}</Text>
+        <Text style={styles.title}>{group.name}</Text>
         <Pressable onPress={goToGroupOption}>
           <View style={styles.icon}>
             <Ionicons name="menu-outline" size={32} color="black" />

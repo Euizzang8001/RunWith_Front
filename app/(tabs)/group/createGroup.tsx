@@ -1,11 +1,30 @@
 import InputField from '@/components/InputField';
 import { colors } from '@/constants';
+import { useCreateGroup } from '@/hooks/mutations/group/use-create-group';
 import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CreateGroup() {
+  const [name, setName] = useState('');
+
+  const nickname = 'testNickname';
+
+  const { mutate: createGroup } = useCreateGroup({
+    onSuccess: () => {
+      Alert.alert('그룹 생성 성공');
+      router.push('/(tabs)/group');
+    },
+    onError: (error) => {
+      console.error('진짜 에러 원인:', error);
+      alert('그룹 생성 오류: ' + error.message);
+    },
+  });
+
+  const tempRunnerId = Math.floor(Math.random() * 1000000);
+
   return (
     <SafeAreaView>
       <View style={styles.container_top}>
@@ -19,15 +38,28 @@ export default function CreateGroup() {
       </View>
 
       <View style={styles.inputWrapper}>
-        <InputField label="그룹 명" placeholder="그룹명을 입력해 주세요." />
-
         <InputField
+          value={name}
+          onChangeText={setName}
+          label="그룹 명"
+          placeholder="그룹명을 입력해 주세요."
+        />
+
+        {/* <InputField
+          value={description}
+          onChangeText={setDescription}
           label="소개글"
           placeholder="그룹을 소개하는 문구를 입력해 주세요."
-        />
+        /> */}
       </View>
 
-      <Pressable style={styles.createButton}>
+      <Pressable
+        onPress={() => {
+          console.log('버튼클릭');
+          createGroup({ name, runnerId: tempRunnerId, nickname });
+        }}
+        style={styles.createButton}
+      >
         <Text style={styles.createButtonText}>생성</Text>
       </Pressable>
     </SafeAreaView>
@@ -60,7 +92,7 @@ const styles = StyleSheet.create({
     gap: 30,
   },
   createButton: {
-    paddingVertical: 300,
+    marginTop: 40,
     alignItems: 'center',
   },
   createButtonText: {

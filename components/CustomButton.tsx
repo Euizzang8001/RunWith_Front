@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   outline: {
-    fontSize: 18,
     backgroundColor: colors.WHITE,
     borderColor: colors.BLUE,
     borderWidth: 1,

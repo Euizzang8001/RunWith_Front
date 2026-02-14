@@ -32,7 +32,7 @@ interface GroupList {
   id: string;
   participants: string[];
   capacity: number;
-  title: string;
+  name: string;
 }
 
 interface Schedule {

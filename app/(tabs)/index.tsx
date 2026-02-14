@@ -1,5 +1,5 @@
+import HomeTab from '@/components/Home/HomeTab';
 import { colors } from '@/constants';
-import HomeTab from '@/pages/HomeTab';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // 인덱스 페이지

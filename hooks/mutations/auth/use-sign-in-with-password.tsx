@@ -6,6 +6,7 @@ export function useSignInWithPassword(callbacks?: UseMutaionCallback) {
   return useMutation({
     mutationFn: signInWithPassword,
     onError: (error) => {
+      console.error('로그인 실패 원인:', error);
       if (callbacks?.onError) callbacks.onError(error);
     },
     onSuccess: () => {

@@ -29,18 +29,23 @@ export default function LoginScreen() {
     });
 
   const handleSignInWithPassword = () => {
-    console.log('버튼 클릭됨!', { email, password });
-    if (email.trim() === '') return;
-    if (password.trim() === '') return;
+    if (email.trim() === '') {
+      Alert.alert('이메일을 입력해 주세요.');
+      return;
+    }
+    if (password.trim() === '') {
+      Alert.alert('비밀번호를 입력해 주세요.');
+      return;
+    }
     signInWithPassword({ email, password });
   };
 
   const navigateHome = () => {
-    router.replace('/(tabs)/group');
+    router.replace('/(tabs)');
   };
 
   const navigateSignUp = () => {
-    router.push('/auth/signUp');
+    router.push('/(tabs)');
   };
 
   return (
