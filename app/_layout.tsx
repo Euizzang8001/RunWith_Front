@@ -1,4 +1,5 @@
 import { colors } from '@/constants';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Font from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -13,6 +14,8 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const queryClient = new QueryClient();
+
   const [fontLoaded, setFontLoaded] = useState(false);
   useEffect(() => {
     async function loadFonts() {
@@ -48,42 +51,44 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: false,
-        }}
-      />
+    <QueryClientProvider client={queryClient}>
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
 
-      <Stack.Screen
-        name="(tabs)"
-        options={{
-          headerShown: false,
-          contentStyle: {
-            backgroundColor: colors.WHITE,
-          },
-        }}
-      />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+            contentStyle: {
+              backgroundColor: colors.WHITE,
+            },
+          }}
+        />
 
-      <Stack.Screen
-        name="auth"
-        options={{
-          headerShown: false,
-        }}
-      />
+        <Stack.Screen
+          name="auth"
+          options={{
+            headerShown: false,
+          }}
+        />
 
-      <Stack.Screen
-        name="modal"
-        options={{ presentation: 'modal', title: 'Modal' }}
-      />
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: 'modal', title: 'Modal' }}
+        />
 
-      <Stack.Screen
-        name="calendar"
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack>
+        <Stack.Screen
+          name="calendar"
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack>
+    </QueryClientProvider>
   );
 }

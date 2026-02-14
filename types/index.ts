@@ -44,4 +44,18 @@ interface Schedule {
   scheduleTime: string;
 }
 
-export type { GroupItem, GroupList, ImageUri, Post, Schedule };
+type UseMutaionCallback = {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+  onMutate?: () => void;
+  onSetteld?: () => void;
+};
+
+export type {
+  GroupItem,
+  GroupList,
+  ImageUri,
+  Post,
+  Schedule,
+  UseMutaionCallback,
+};
