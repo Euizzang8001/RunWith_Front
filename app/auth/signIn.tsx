@@ -1,6 +1,9 @@
 import CustomButton from '@/components/CustomButton';
 import InputField from '@/components/InputField';
+import Loader from '@/components/Loader';
+import GoogleLogin from '@/components/OAuth/GoogleLogin';
 import { useSignInWithPassword } from '@/hooks/mutations/auth/use-sign-in-with-password';
+import { useAuthActions } from '@/store/useAuthStore';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -13,31 +16,34 @@ import {
 } from 'react-native';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
-  const { mutate: signInWithPassword, isPending: isSignInWithPasswordPending } =
-    useSignInWithPassword({
-      onSuccess: () => {
-        Alert.alert('로그인 성공');
-        navigateHome();
-      },
-      onError: (error) => {
-        Alert.alert('로그인 실패', error.message || '알 수 없는 오류');
-        setPassword('');
-      },
-    });
+  const { setLogin } = useAuthActions();
+
+  const { mutate: signInWithPassword, isPending } = useSignInWithPassword({
+    onSuccess: (data) => {
+      console.log('로그인 응답:', data);
+      Alert.alert('로그인 성공');
+      setLogin(data);
+      navigateHome();
+    },
+    onError: (error) => {
+      Alert.alert('로그인 실패', error.message || '알 수 없는 오류');
+      setLoginPassword('');
+    },
+  });
 
   const handleSignInWithPassword = () => {
-    if (email.trim() === '') {
+    if (loginEmail.trim() === '') {
       Alert.alert('이메일을 입력해 주세요.');
       return;
     }
-    if (password.trim() === '') {
+    if (loginEmail.trim() === '') {
       Alert.alert('비밀번호를 입력해 주세요.');
       return;
     }
-    signInWithPassword({ email, password });
+    signInWithPassword({ loginEmail, loginPassword });
   };
 
   const navigateHome = () => {
@@ -45,7 +51,7 @@ export default function LoginScreen() {
   };
 
   const navigateSignUp = () => {
-    router.push('/(tabs)');
+    router.push('/auth/signUp');
   };
 
   return (
@@ -54,18 +60,20 @@ export default function LoginScreen() {
         <Text style={styles.font}>RunWith</Text>
       </View>
 
+      <Loader visible={isPending} />
+
       <View style={{ flex: 1 }}>
         {/* 사용자 입력 폼 */}
         <View style={styles.container}>
           <InputField
             keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+            value={loginEmail}
+            onChangeText={setLoginEmail}
             placeholder="이메일을 입력하세요."
           />
           <InputField
-            value={password}
-            onChangeText={setPassword}
+            value={loginPassword}
+            onChangeText={setLoginPassword}
             secureTextEntry={true}
             placeholder="비밀번호를 입력하세요."
           />
@@ -79,6 +87,7 @@ export default function LoginScreen() {
             textVariant="textFilled"
             onPress={handleSignInWithPassword}
           />
+          <GoogleLogin />
           <CustomButton
             label="회원가입"
             size="large"

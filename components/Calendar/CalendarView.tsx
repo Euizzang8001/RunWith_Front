@@ -1,6 +1,11 @@
 import { colors } from '@/constants';
 import '@/lib/calendarLocale';
-import { Schedule } from '@/types';
+import { useUserSession } from '@/store/useAuthStore';
+import {
+  useActionsSchedules,
+  useScheduleStore,
+} from '@/store/useScheduleStore';
+import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
   Alert,
@@ -16,17 +21,13 @@ import { MarkedDates } from 'react-native-calendars/src/types';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import InputField from '../InputField';
 
-type CalendarViewProps = {
-  schedules: Schedule[];
-  addSchedules: (newContent: Omit<Schedule, 'id'>) => void;
-  deleteSchedules: (id: string) => void;
-};
+export default function CalendarView() {
+  const { groupId } = useLocalSearchParams<{
+    groupId: string;
+  }>();
+  const { schedules } = useScheduleStore();
+  const { addSchedule, deleteSchedule } = useActionsSchedules();
 
-export default function CalendarView({
-  schedules,
-  addSchedules,
-  deleteSchedules,
-}: CalendarViewProps) {
   const [selected, setSelected] = useState('');
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [isAddModalOpen, setisAddModalOpen] = useState(false);
@@ -37,6 +38,8 @@ export default function CalendarView({
   const [endTime, setEndTime] = useState('');
 
   const [pickerMode, setPickerMode] = useState<'start' | 'end' | null>(null);
+
+  const user = useUserSession();
 
   const formatTime = (date: Date) =>
     date.toLocaleTimeString('ko-KR', {
@@ -81,12 +84,25 @@ export default function CalendarView({
   }, [selected, schedules]);
 
   const handleAddSchedule = () => {
-    addSchedules({
-      runnerId: '1',
-      isSelf: true,
+    if (TitleInput.trim() === '') {
+      Alert.alert('일정을 입력해 주세요.');
+      return;
+    }
+    if (startTime.trim() === '') {
+      Alert.alert('시작 시간을 선택해 주세요.');
+      return;
+    }
+    if (endTime.trim() === '') {
+      Alert.alert('종료 시간을 선택해 주세요.');
+      return;
+    }
+    addSchedule({
+      runnerId: user!.runnerId,
+      groupId: groupId,
       date: selected,
       title: TitleInput,
-      scheduleTime: `${startTime} ~ ${endTime}`,
+      startTime: startTime,
+      endTime: endTime,
     });
     setIsScheduleOpen(true);
     setisAddModalOpen(false);
@@ -100,7 +116,7 @@ export default function CalendarView({
       {
         text: '삭제',
         style: 'destructive',
-        onPress: () => deleteSchedules(id),
+        onPress: () => deleteSchedule(id),
       },
       { text: '취소', style: 'cancel' },
     ]);
@@ -149,10 +165,20 @@ export default function CalendarView({
           onPress={() => setIsScheduleOpen(false)}
         />
         <View style={styles.modalContent}>
-          <View>
+          <View style={styles.addSchedule_container}>
             <Text style={styles.schedule_date}>
               {filteredSchedules.length > 0 && selected}
             </Text>
+            <View style={styles.add_container}>
+              <Pressable
+                onPress={() => {
+                  setIsScheduleOpen(false);
+                  setisAddModalOpen(true);
+                }}
+              >
+                <Text style={styles.addSchedule}>일정 추가</Text>
+              </Pressable>
+            </View>
           </View>
 
           <View style={styles.schedule_container}>
@@ -160,12 +186,14 @@ export default function CalendarView({
               bounces={true}
               showsVerticalScrollIndicator={false}
               data={filteredSchedules}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => String(item.id)}
               renderItem={({ item }) => (
                 <View style={styles.schedule_card}>
                   <View style={styles.card_info}>
                     <Text>{item.title}</Text>
-                    <Text>{item.scheduleTime}</Text>
+                    <Text>
+                      {item.startTime} ~ {item.endTime}
+                    </Text>
 
                     <Pressable onPress={() => handleDeleteSchedule(item.id)}>
                       <Text>삭제</Text>
@@ -174,19 +202,9 @@ export default function CalendarView({
                 </View>
               )}
               ListEmptyComponent={
-                <View style={styles.add_container}>
-                  <Text style={styles.noSchedule}>
-                    {selected && '일정이 없습니다.'}
-                  </Text>
-                  <Pressable
-                    onPress={() => {
-                      setIsScheduleOpen(false);
-                      setisAddModalOpen(true);
-                    }}
-                  >
-                    <Text style={styles.addSchedule}>일정 추가</Text>
-                  </Pressable>
-                </View>
+                <Text style={styles.noSchedule}>
+                  {selected && '일정이 없습니다.'}
+                </Text>
               }
               scrollEnabled={true}
             />
@@ -238,7 +256,7 @@ export default function CalendarView({
 
             <View style={styles.actionContainer}>
               <Pressable onPress={handleAddSchedule} style={styles.saveButton}>
-                <Text style={styles.saveText}>저장</Text>
+                <Text>저장</Text>
               </Pressable>
               <Pressable
                 onPress={() => setisAddModalOpen(false)}
@@ -332,9 +350,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 24,
   },
-  saveText: {
-    // color: colors.WHITE,
-  },
   cancelButton: {
     borderWidth: 1,
     borderColor: colors.RED,
@@ -343,7 +358,7 @@ const styles = StyleSheet.create({
   },
   add_container: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   addSchedule: {
@@ -353,6 +368,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.BLUE,
     color: colors.WHITE,
     padding: 10,
+  },
+  addSchedule_container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+
+    marginBottom: 10,
   },
   noSchedule: {
     fontSize: 16,

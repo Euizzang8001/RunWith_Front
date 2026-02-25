@@ -1,16 +1,26 @@
 import { colors } from '@/constants';
-import { dummyGroups } from '@/mocks/groups';
-import { dummy_schedules } from '@/mocks/schedule';
-import { dummyUsers } from '@/mocks/users';
+import { useGetGroupInRunner } from '@/hooks/queries/use-get-group-in-runner.data';
+import { useGetGroups } from '@/hooks/queries/use-get-group.data';
+import { useUserSession } from '@/store/useAuthStore';
+import { useScheduleStore } from '@/store/useScheduleStore';
 import { Schedule } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+type Runner = {
+  runnerId: string;
+  groupNickname: string;
+  runnerName: string;
+  name?: string;
+};
+
 export default function GroupDetail() {
+  const user = useUserSession();
+  const { schedules } = useScheduleStore();
   const today = new Date().toLocaleDateString('sv-SE');
 
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -19,15 +29,29 @@ export default function GroupDetail() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { groupId } = useLocalSearchParams<{ groupId: string }>();
+  const { groupId } = useLocalSearchParams<{
+    groupId: string;
+  }>();
+  const { data: groups } = useGetGroups();
+  const { data: runners } = useGetGroupInRunner(groupId);
 
-  const group = dummyGroups.find((item) => String(item.id) === groupId);
+  const group = groups?.find((item: any) => String(item.groupId) === groupId);
 
   const goToGroupOption = () => {
+    if (!user) {
+      Alert.alert('알림', '로그인이 필요한 서비스입니다.');
+      return;
+    }
+
+    const myInfo = runners?.find(
+      (runner: Runner) => runner.runnerId === user?.runnerId,
+    );
+
     router.push({
       pathname: '/(tabs)/group/groupOptions',
       params: {
-        groupId: group?.id,
+        groupId: group?.groupId,
+        runnerId: myInfo?.runnerId,
       },
     });
   };
@@ -35,18 +59,20 @@ export default function GroupDetail() {
   const selectedUserSchedules = useMemo(() => {
     if (!selectedUser) return [];
 
-    return dummy_schedules.filter(
+    return schedules.filter(
       (schedule) =>
         schedule.runnerId === selectedUser &&
         schedule.date === today &&
-        schedule.isSelf === false,
+        schedule.groupId === groupId,
     );
-  }, [selectedUser, today]);
+  }, [selectedUser, schedules, today, groupId]);
 
-  const members = useMemo(() => {
-    if (!group) return [];
-    return dummyUsers.filter((user) => group.participants.includes(user.id));
-  }, [group?.participants]);
+  // 그룹 러너 로그 찍기
+  // useEffect(() => {
+  //   if (runners && runners.length > 0) {
+  //     console.log('러너 데이터:', runners[0]);
+  //   }
+  // }, [runners]);
 
   if (!group)
     return (
@@ -55,28 +81,32 @@ export default function GroupDetail() {
       </SafeAreaView>
     );
 
-  const seletedUser = members.find((user) => user.id === selectedUser)?.name;
+  const selectedUserName = runners?.find(
+    (user: Runner) => user.runnerId === selectedUser,
+  )?.runnerName;
 
   return (
     <SafeAreaView>
       <View style={styles.header}>
-        <View style={styles.leftSpace}></View>
-        <Text style={styles.title}>{group.name}</Text>
-        <Pressable onPress={goToGroupOption}>
-          <View style={styles.icon}>
+        <Pressable style={styles.arrow_icon} onPress={() => router.back()}>
+          <Feather name="arrow-left" size={32} color="black" />
+        </Pressable>
+        <Text style={styles.title}>{group.groupName}</Text>
+        <Pressable style={styles.icon} onPress={goToGroupOption}>
+          <View>
             <Ionicons name="menu-outline" size={32} color="black" />
           </View>
         </Pressable>
       </View>
 
       <View style={styles.user_icon_Wrapper}>
-        {members.map((user) => {
-          const isSelected = selectedUser === user.id;
+        {runners?.map((user: Runner) => {
+          const isSelected = selectedUser === user.runnerId;
 
           return (
             <Pressable
-              key={user.id}
-              onPress={() => setSelectedUser(user.id)}
+              key={user.runnerId}
+              onPress={() => setSelectedUser(user.runnerId)}
               style={[styles.user_icon, isSelected && styles.userSelcetd]}
             >
               <Feather name="user" size={24} color={'black'} />
@@ -87,7 +117,11 @@ export default function GroupDetail() {
       <View style={styles.text_container}>
         {selectedUser !== null ? (
           <View>
-            <Text style={styles.seletedUserText}>{seletedUser}</Text>
+            <Text style={styles.seletedUserText}>
+              {selectedUserName
+                ? `${selectedUserName}의 일정`
+                : '닉네임을 불러 올 수 없습니다.'}
+            </Text>
 
             {selectedUserSchedules.length > 0 ? (
               selectedUserSchedules.map((schedule) => (
@@ -100,11 +134,13 @@ export default function GroupDetail() {
                   key={schedule.id}
                 >
                   <Text>{schedule.title}</Text>
-                  <Text>{schedule.scheduleTime}</Text>
+                  <Text>
+                    {schedule.startTime} ~ {schedule.endTime}
+                  </Text>
                 </Pressable>
               ))
             ) : (
-              <Text style={styles.noScheduleDay}> 오늘 일정이 없습니다. </Text>
+              <Text style={styles.noScheduleDay}>오늘 일정이 없습니다.</Text>
             )}
           </View>
         ) : (
@@ -122,7 +158,9 @@ export default function GroupDetail() {
               {selectedSchedule && (
                 <View>
                   <Text>{selectedSchedule.title}</Text>
-                  <Text>{selectedSchedule.scheduleTime}</Text>
+                  <Text>
+                    {selectedSchedule.startTime} ~ {selectedSchedule.endTime}
+                  </Text>
 
                   <Pressable onPress={() => setIsModalOpen(false)}>
                     <Text>X</Text>
@@ -145,19 +183,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  arrow_icon: {
+    marginLeft: 5,
+    width: 48,
+    alignItems: 'center',
+  },
   title: {
     textAlign: 'center',
     flex: 1,
     fontSize: 18,
     fontFamily: 'pretendard600',
   },
-  leftSpace: {
-    width: 32,
-  },
   icon: {
-    width: 32,
-    alignItems: 'flex-end',
-    alignContent: 'center',
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   user_icon_Wrapper: {
     alignItems: 'center',

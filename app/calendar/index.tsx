@@ -1,14 +1,10 @@
 import CalendarScreen from '@/components/Calendar/CalendarScreen';
-import { Schedule } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CalendarPage() {
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
-
   return (
     <SafeAreaView>
       <View style={styles.container_top}>

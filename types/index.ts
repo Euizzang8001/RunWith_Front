@@ -1,61 +1,40 @@
 interface User {
-  id: string;
-  nickname: string;
-  imageUri?: string;
+  runnerId: string;
+  runnerName: string;
+  runnerImageLink: string;
 }
 
-interface ImageUri {
-  id?: number;
-  uri: string;
-}
-
-interface Post {
-  id: string;
-  userId: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  scheduleTime: string;
-}
-
-interface GroupItem {
-  id: string;
-  userId: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  nickname: string;
-  author: User;
-}
-
-interface GroupList {
-  id: string;
-  participants: string[];
-  capacity: number;
-  name: string;
+interface GroupInfo {
+  groupId: string;
+  groupDescription: string;
+  groupImageLink: string | null;
+  groupName: string;
+  // participants?: string[];
+  // capacity?: number;
 }
 
 interface Schedule {
   id: string;
+  groupId: string;
   runnerId: string;
-  isSelf: boolean;
   title: string;
   date: string;
-  scheduleTime: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface Feed {
+  title: string;
+  startTime: number;
+  endTime: number;
+  description: string;
 }
 
 type UseMutaionCallback = {
-  onSuccess?: () => void;
+  onSuccess?: (data: any) => void;
   onError?: (error: Error) => void;
   onMutate?: () => void;
   onSetteld?: () => void;
 };
 
-export type {
-  GroupItem,
-  GroupList,
-  ImageUri,
-  Post,
-  Schedule,
-  UseMutaionCallback,
-};
+export type { Feed, GroupInfo, Schedule, UseMutaionCallback, User };

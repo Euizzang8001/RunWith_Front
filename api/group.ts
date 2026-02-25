@@ -1,25 +1,50 @@
 export async function createGroup({
-  name,
+  groupName,
   runnerId,
-  nickname,
+  groupNickname,
+  groupCertificationCriteria,
+  groupDescription,
+  groupImageLink,
 }: {
-  name: string;
-  runnerId?: number;
-  nickname: string;
+  groupName: string;
+  runnerId: string;
+  groupNickname: string;
+  groupCertificationCriteria: number;
+  groupDescription: string;
+  groupImageLink?:
+    | { uri: string; fileName?: string | null; mimeType?: string | null }
+    | undefined;
 }) {
+  const formData = new FormData();
+
+  if (groupImageLink) {
+    formData.append('image', {
+      uri: groupImageLink.uri,
+      name: groupImageLink.fileName || 'group_image.jpg',
+      type: groupImageLink.mimeType || 'image/jpe',
+    } as any);
+  }
+
+  const data = {
+    groupName,
+    runnerId,
+    groupNickname,
+    groupCertificationCriteria,
+    groupDescription,
+  };
+
+  formData.append('request', {
+    string: JSON.stringify(data),
+    type: 'application/json',
+  } as any);
+
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups/add`,
+    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups`,
     {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, runnerId, nickname }),
+      body: formData,
     },
   );
-  const errorBody = await response.text();
-  console.log('서버 에러 응답:', errorBody);
-
   if (!response.ok) {
     throw new Error('그룹 생성 오류');
   }
@@ -39,6 +64,32 @@ export async function getGroups() {
   );
   if (!response.ok) {
     throw new Error('그룹 목록 조회 오류');
+  }
+  return response.json();
+}
+
+export async function deleteGroup({
+  groupId,
+  runnerId,
+}: {
+  groupId: string;
+  runnerId: string;
+}) {
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups/groupId=${groupId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        runnerId: runnerId,
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('그룹 삭제에 실패했습니다.');
   }
   return response.json();
 }

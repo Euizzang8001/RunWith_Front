@@ -1,22 +1,26 @@
 import { colors } from '@/constants';
-import { Post } from '@/types';
-import { StyleSheet, Text, View } from 'react-native';
+import { Schedule } from '@/types';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type FeedItemProps = {
-  post: Post;
+  post: Schedule;
+  onPress: () => void;
 };
 
-export default function FeedItem({ post }: FeedItemProps) {
+export default function FeedItem({ post, onPress }: FeedItemProps) {
   return (
-    <View style={styles.container}>
-      <View style={styles.item}>
-        <View style={styles.info}>
-          <Text style={styles.title}>{post.title}</Text>
-          <Text>{post.scheduleTime}</Text>
-          <Text>{post.description}</Text>
+    <Pressable onPress={onPress}>
+      <View style={styles.container}>
+        <View style={styles.item}>
+          <View style={styles.info}>
+            <Text style={styles.title}>{post.title}</Text>
+            <Text>
+              {post.startTime} ~ {post.endTime}
+            </Text>
+          </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

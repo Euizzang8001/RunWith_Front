@@ -9,8 +9,8 @@ export function useSignInWithPassword(callbacks?: UseMutaionCallback) {
       console.error('로그인 실패 원인:', error);
       if (callbacks?.onError) callbacks.onError(error);
     },
-    onSuccess: () => {
-      if (callbacks?.onSuccess) callbacks.onSuccess();
+    onSuccess: (data) => {
+      if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
   });
 }

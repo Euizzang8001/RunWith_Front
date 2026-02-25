@@ -1,11 +1,19 @@
 import CustomButton from '@/components/CustomButton';
 import InputField from '@/components/InputField';
 import { router } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
-export default function SingUpScreen() {
+export default function SignUpScreen() {
+  const [runnerEmail, setRunnerEmail] = useState('');
+
   const navigateSignUpPassword = () => {
-    router.push('/auth/signUpPassword');
+    if (runnerEmail.trim() === '') {
+      Alert.alert('이메일을 입력해 주세요.');
+      return;
+    }
+
+    router.push({ pathname: '/auth/signUpPassword', params: { runnerEmail } });
   };
   return (
     <>
@@ -14,7 +22,11 @@ export default function SingUpScreen() {
       </View>
 
       <View style={styles.container}>
-        <InputField placeholder="이메일을 입력하세요." />
+        <InputField
+          value={runnerEmail}
+          onChangeText={setRunnerEmail}
+          placeholder="이메일을 입력하세요."
+        />
         <View style={styles.emailAuthButton}>
           <CustomButton
             label="인증 요청"

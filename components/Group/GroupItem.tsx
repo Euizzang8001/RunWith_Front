@@ -1,14 +1,14 @@
 import { colors } from '@/constants';
-import { GroupList } from '@/types';
+import { GroupInfo } from '@/types';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 type GroupListProps = {
-  group: GroupList;
+  group: GroupInfo;
 };
 
 export default function GroupItem({ group }: GroupListProps) {
-  const currentCount = group?.participants?.length;
+  const defaultGroupImage = require('@/assets/images/default-group-image.png');
 
   return (
     <Pressable
@@ -16,7 +16,7 @@ export default function GroupItem({ group }: GroupListProps) {
         router.push({
           pathname: '/(tabs)/group/groupDetail',
           params: {
-            groupId: group.id,
+            groupId: group.groupId,
           },
         })
       }
@@ -24,10 +24,15 @@ export default function GroupItem({ group }: GroupListProps) {
       <View style={styles.container}>
         <View style={styles.item}>
           <View style={styles.info}>
-            <Text style={styles.title}>{group.name}</Text>
-            <Text style={styles.headCount}>
-              {currentCount} / {group.capacity} 명
-            </Text>
+            <Image
+              source={
+                group.groupImageLink
+                  ? { uri: group.groupImageLink }
+                  : defaultGroupImage
+              }
+              style={styles.groupImage}
+            />
+            <Text style={styles.title}>{group.groupName}</Text>
           </View>
         </View>
       </View>
@@ -60,6 +65,10 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 20,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+  },
+  groupImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 24,
   },
 });
