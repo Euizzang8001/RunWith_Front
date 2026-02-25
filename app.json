@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "runwith",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
@@ -37,6 +37,7 @@
       "expo-router",
       [
         "expo-splash-screen",
+
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
@@ -51,7 +52,14 @@
       "@react-native-google-signin/google-signin",
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
-      "expo-build-properties"
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "dynamic"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
