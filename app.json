@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "runwith",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
@@ -57,8 +57,16 @@
         {
           "ios": {
             "newArchEnabled": true,
-            "useFrameworks": "dynamic",
-            "useModularHeaders": true
+            "extraPods": [
+              {
+                "name": "FirebaseCore",
+                "modular_headers": true
+              },
+              {
+                "name": "FirebaseAuth",
+                "modular_headers": true
+              }
+            ]
           }
         }
       ]
