@@ -1,5 +1,6 @@
 import { colors } from '@/constants';
-import { useGetGroups } from '@/hooks/queries/use-get-group.data';
+import { useGetMineGroups } from '@/hooks/queries/use-get-mine-groups.data';
+import { useUserSession } from '@/store/useAuthStore';
 import {
   useActionsSchedules,
   useScheduleStore,
@@ -18,7 +19,8 @@ import {
 import FeedItem from './FeedItem';
 
 export default function FeedList() {
-  const { data: groups } = useGetGroups();
+  const user = useUserSession();
+  const { data: groups } = useGetMineGroups(user?.token || '');
   const { schedules } = useScheduleStore();
   const { updateSchedule } = useActionsSchedules();
 
