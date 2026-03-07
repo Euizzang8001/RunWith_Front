@@ -1,4 +1,5 @@
 import { colors } from '@/constants';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Font from 'expo-font';
 import { Stack } from 'expo-router';
@@ -17,6 +18,14 @@ export default function RootLayout() {
   const queryClient = new QueryClient();
 
   const [fontLoaded, setFontLoaded] = useState(false);
+  useEffect(() => {
+    // 앱 시작과 동시에 Google SDK 설정
+    GoogleSignin.configure({
+      webClientId:
+        '221570016133-barlvpo8bvu8utpkh2k97tseudhpdf3e.apps.googleusercontent.com',
+    });
+  }, []);
+
   useEffect(() => {
     async function loadFonts() {
       try {
