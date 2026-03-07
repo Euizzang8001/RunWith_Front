@@ -7,13 +7,15 @@
     "icon": "./assets/images/icon.png",
     "scheme": "runwith",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.dev.RunWith",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowArbitraryLoads": true
+        }
       }
     },
     "android": {
@@ -56,17 +58,8 @@
         "expo-build-properties",
         {
           "ios": {
-            "newArchEnabled": true,
-            "extraPods": [
-              {
-                "name": "FirebaseCore",
-                "modular_headers": true
-              },
-              {
-                "name": "FirebaseAuth",
-                "modular_headers": true
-              }
-            ]
+            "useFrameworks": "static",
+            "forceStaticLinking": ["RNFBApp", "RNFBAuth"]
           }
         }
       ]
