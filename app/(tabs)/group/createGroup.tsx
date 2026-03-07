@@ -3,20 +3,42 @@ import InputField from '@/components/InputField';
 import Loader from '@/components/Loader';
 import { colors } from '@/constants';
 import { useCreateGroup } from '@/hooks/mutations/group/use-create-group';
-import { useUserSession } from '@/store/useAuthStore';
+import { useUpdateGroup } from '@/hooks/mutations/group/use-update-groups';
+import { useGetGroups } from '@/hooks/queries/use-get-group.data';
+import { useAuthActions, useUserSession } from '@/store/useAuthStore';
+import { GroupInfo } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
+import auth from '@react-native-firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CreateGroup() {
+  const { groupId } = useLocalSearchParams<{ groupId: string }>();
+  const userSession = useUserSession();
+  const { setLogin } = useAuthActions();
   const [groupName, setGroupName] = useState('');
   const [groupDescription, setGroupDescription] = useState('');
   const [selectedImage, setSelectedImage] = useState<
     ImagePicker.ImagePickerAsset | undefined
   >(undefined);
+  const { data: groups } = useGetGroups(userSession?.token || '', '');
+
+  const groupItem = groups?.find((item: GroupInfo) => item.groupId === groupId);
+  const mode = groupId ? 'edit' : 'create';
+
+  useEffect(() => {
+    if (mode === 'edit' && groupItem) {
+      setGroupName(groupItem.groupName);
+      setGroupDescription(groupItem.groupDescription);
+
+      if (groupItem.groupImageLink) {
+        setSelectedImage({ uri: groupItem.groupImageLink } as any);
+      }
+    }
+  }, [groupItem, mode]);
 
   const pickImageAsync = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -32,9 +54,18 @@ export default function CreateGroup() {
 
   const defaultImage = require('@/assets/images/default-avatar.jpg');
 
-  const user = useUserSession();
-
   const groupNickname = 'test12345';
+
+  const { mutate: updateGroup } = useUpdateGroup({
+    onSuccess: () => {
+      Alert.alert('성공', '그룹 수정이 성공했습니다.');
+      router.back();
+    },
+    onError: (error) => {
+      console.error('에러:', error);
+      alert('그룹 수정 오류: ' + error.message);
+    },
+  });
 
   const { mutate: createGroup, isPending } = useCreateGroup({
     onSuccess: () => {
@@ -47,12 +78,17 @@ export default function CreateGroup() {
     },
   });
 
-  const handleCreateGroup = () => {
+  const handleCreateGroup = async () => {
+    const user = auth().currentUser;
+    const freshToken = await user?.getIdToken();
     if (!user) {
       return;
     }
-
-    if (groupName.trim() === '') {
+    if (!freshToken) {
+      Alert.alert('오류', '로그인 세션이 만료되었습니다.');
+      return;
+    }
+    if (mode === 'create' && groupName.trim() === '') {
       Alert.alert('그룹 명을 입력해 주세요.');
       return;
     }
@@ -62,15 +98,38 @@ export default function CreateGroup() {
       return;
     }
 
-    createGroup({
-      groupName,
-      runnerId: String(user.runnerId),
-      groupNickname,
-      groupCertificationCriteria: 3,
-      groupDescription,
-      groupImageLink: selectedImage,
-    });
+    if (mode === 'edit') {
+      updateGroup({
+        groupId: groupId!,
+        token: freshToken,
+        groupCertificationCriteria: 3,
+        groupDescription,
+        groupImageLink: selectedImage,
+      });
+    } else {
+      createGroup(
+        {
+          groupName,
+          token: freshToken,
+          groupNickname,
+          groupCertificationCriteria: 3,
+          groupDescription,
+          groupImageLink: selectedImage,
+        },
+        {
+          onSuccess: () => {
+            if (userSession) {
+              setLogin({
+                ...userSession,
+                token: freshToken || '',
+              });
+            }
+          },
+        },
+      );
+    }
   };
+
   return (
     <SafeAreaView>
       <Loader visible={isPending} />
@@ -79,11 +138,19 @@ export default function CreateGroup() {
           <Feather name="arrow-left" size={32} color="black" />
         </Pressable>
 
-        <Text style={styles.header}>새 그룹 만들기</Text>
-        <Pressable>
-          <Text>그룹 참여</Text>
-        </Pressable>
-        <View style={styles.right} />
+        <Text style={styles.header}>
+          {mode === 'edit' ? '그룹 수정하기' : '새 그룹 만들기'}
+        </Text>
+        <View style={styles.sideArea}>
+          {mode === 'create' && (
+            <Pressable
+              onPress={() => router.push('/(tabs)/group/joinGroup')}
+              style={styles.participate}
+            >
+              <Text>그룹 참여</Text>
+            </Pressable>
+          )}
+        </View>
       </View>
 
       <Pressable onPress={pickImageAsync} style={styles.image_wrapper}>
@@ -96,12 +163,14 @@ export default function CreateGroup() {
       </Pressable>
 
       <View style={styles.inputWrapper}>
-        <InputField
-          value={groupName}
-          onChangeText={setGroupName}
-          label="그룹 명"
-          placeholder="그룹명을 입력해 주세요."
-        />
+        {mode === 'create' && (
+          <InputField
+            value={groupName}
+            onChangeText={setGroupName}
+            label="그룹 명"
+            placeholder="그룹명을 입력해 주세요."
+          />
+        )}
 
         <InputField
           value={groupDescription}
@@ -112,7 +181,9 @@ export default function CreateGroup() {
       </View>
 
       <Pressable onPress={handleCreateGroup} style={styles.createButton}>
-        <Text style={styles.createButtonText}>생성</Text>
+        <Text style={styles.createButtonText}>
+          {mode === 'edit' ? '수정' : '생성'}
+        </Text>
       </Pressable>
     </SafeAreaView>
   );
@@ -125,6 +196,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingBottom: 50,
+    justifyContent: 'space-between',
   },
   header: {
     flex: 1,
@@ -134,11 +206,8 @@ const styles = StyleSheet.create({
   },
   arrow_icon: {
     marginLeft: 5,
-    width: 48,
+    width: 80,
     alignItems: 'center',
-  },
-  right: {
-    width: 48,
   },
   inputWrapper: {
     marginTop: 20,
@@ -159,5 +228,12 @@ const styles = StyleSheet.create({
   image_wrapper: {
     alignItems: 'center',
     marginBottom: 30,
+  },
+  participate: {
+    right: 10,
+    padding: 10,
+  },
+  sideArea: {
+    width: 80,
   },
 });

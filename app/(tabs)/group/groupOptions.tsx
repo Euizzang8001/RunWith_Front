@@ -1,75 +1,444 @@
+import GroupMemberItem from '@/components/Group/GroupMemberItem';
+import { colors } from '@/constants';
+import { useQuitGroup } from '@/hooks/mutations/belongs/use-delete-join-group';
+import { useUpdateLeader } from '@/hooks/mutations/belongs/use-update-leader';
 import { useDeleteGroup } from '@/hooks/mutations/group/use-delete-group';
+import { useAccpetJoinRequest } from '@/hooks/mutations/join/use-accpet-join-request';
+import { useRejectJoinRequest } from '@/hooks/mutations/join/use-reject-join-requset';
+import { useGetJoinRequestList } from '@/hooks/queries/join/use-get-join-request-list.data';
 import { useGetGroupInRunner } from '@/hooks/queries/use-get-group-in-runner.data';
 import { useGetGroups } from '@/hooks/queries/use-get-group.data';
+import { useUserSession } from '@/store/useAuthStore';
+import { JoinRequest, User } from '@/types';
+import Feather from '@expo/vector-icons/Feather';
+import auth from '@react-native-firebase/auth';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import {
+  Alert,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function GroupOptions() {
+  const { groupId } = useLocalSearchParams<{ groupId: string }>();
+  const user = useUserSession();
+  const [groupName, setGroupName] = useState('');
+
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
+  const { data: getGroupInRunner } = useGetGroupInRunner(
+    groupId,
+    user?.token || '',
+  );
+  console.log(getGroupInRunner);
+
+  const me = getGroupInRunner?.find(
+    (runner: User) => runner.runnerName === user?.runnerName,
+  );
+
+  const isLeader = me?.leader === true;
+
+  const { data: requestList } = useGetJoinRequestList(
+    groupId,
+    user?.token || '',
+  );
+
+  const { mutate: acceptRequest } = useAccpetJoinRequest({
+    onSuccess: () => {
+      Alert.alert('승인', '승인이 완료되었습니다.');
+    },
+    onError: () => {
+      Alert.alert('그룹 신청 승인 오류');
+    },
+  });
+
+  const { mutate: rejectRequest } = useRejectJoinRequest({
+    onSuccess: () => {
+      Alert.alert('거절', '신청을 거절했습니다.');
+    },
+    onError: () => {
+      Alert.alert('그룹 신청 거절 오류');
+    },
+  });
+
+  const { mutate: quitGroup } = useQuitGroup({
+    onSuccess: () => {
+      Alert.alert('그룹을 탈퇴했습니다.');
+      router.replace('/(tabs)/group');
+    },
+    onError: (error) => {
+      Alert.alert('그룹 탈퇴를 실패했습니다.');
+    },
+  });
+
   const { mutate: deleteGroup } = useDeleteGroup({
     onSuccess: () => {
       Alert.alert('그룹이 삭제되었습니다.');
       router.replace('/(tabs)/group');
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      const status = error.status;
+
       Alert.alert('그룹 삭제를 실패했습니다.');
+
+      if (status === 401) {
+        Alert.alert('그룹에 멤버가 남아있어 삭제할 수 없습니다.');
+      }
     },
   });
-  const handleDeleteGroup = (groupId: string, runnerId: string) => {
-    if (!groupId || !runnerId) {
-      Alert.alert('오류', '삭제할 ID가 없습니다.');
-      return;
-    }
-    Alert.alert(
-      '그룹 삭제',
-      '되돌릴 수 없습니다. 정말 그룹을 삭제하시겠습니까?',
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '삭제',
-          style: 'destructive',
-          onPress: () => deleteGroup({ groupId, runnerId }),
-        },
-      ],
-    );
-  };
-  const { groupId, runnerId } = useLocalSearchParams<{
-    groupId: string;
-    runnerId: string;
-  }>();
 
-  const { data: groups } = useGetGroups();
+  const { mutate: updateLeader } = useUpdateLeader({
+    onSuccess: () => {
+      Alert.alert('리더가 변경되었습니다.');
+    },
+    onError: () => {
+      Alert.alert('리더 변경 실패');
+    },
+  });
+
+  const handleUpdateLeader = (runnerId: string, runnerName: string) => {
+    Alert.alert('리더 변경', `${runnerName}님으로 리더를 변경하시겠습니까?`, [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '변경',
+        style: 'destructive',
+        onPress: () => {
+          if (user?.token) {
+            updateLeader({
+              groupId,
+              token: user.token,
+              newLeaderRunnerId: runnerId,
+            });
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleQuitGroup = async (groupId: string) => {
+    Alert.alert('그룹 탈퇴', '정말 그룹을 탈퇴하겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '탈퇴',
+        style: 'destructive',
+        onPress: () => {
+          if (user?.token) {
+            quitGroup({ groupId, token: user.token });
+          } else {
+            Alert.alert('탈퇴 오류', '정보가 존재하지 않습니다.');
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleDeleteGroup = async (groupId: string) => {
+    try {
+      const currentUser = auth().currentUser;
+      const freshToken = await currentUser?.getIdToken(true);
+      if (!groupId || !freshToken) {
+        Alert.alert('오류', '삭제할 ID가 없습니다.');
+        return;
+      }
+      Alert.alert(
+        '그룹 삭제',
+        '되돌릴 수 없습니다. 정말 그룹을 삭제하시겠습니까?',
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '삭제',
+            style: 'destructive',
+            onPress: () => deleteGroup({ groupId, token: freshToken }),
+          },
+        ],
+      );
+    } catch (error) {
+      console.error('토큰 에러', error);
+    }
+  };
+
+  const handleAcceptRequest = (joinRequestId: string) => {
+    Alert.alert('요청 승인', '그룹 신청을 승인하시겠습니까?', [
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+      {
+        text: '승인',
+        style: 'destructive',
+        onPress: () => {
+          if (user?.token) {
+            acceptRequest({ joinRequestId, token: user.token });
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleRejectRequest = (joinRequestId: string) => {
+    Alert.alert('신청 거절', '그룹 신청을 거절하시겠습니까?', [
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+      {
+        text: '거절',
+        style: 'destructive',
+        onPress: () => {
+          if (user?.token) {
+            rejectRequest({ joinRequestId, token: user.token });
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleGroupEdit = () => {
+    router.push({
+      pathname: '/(tabs)/group/createGroup',
+      params: { groupId: groupId },
+    });
+  };
+
+  const { data: groups } = useGetGroups(user?.token || '', groupName);
 
   const groupItem = groups?.find(
     (item: any) => String(item.groupId) === groupId,
   );
-  const { data: runners } = useGetGroupInRunner(groupId);
+  const { data: runners } = useGetGroupInRunner(groupId, user?.token || '');
 
-  const currentCount = runners?.length;
+  console.log('리더:', {
+    myLeaderStatus: isLeader,
+    runnersCount: getGroupInRunner?.length,
+  });
 
   return (
-    <SafeAreaView>
-      <View>
-        <Image
-          source={{ uri: groupItem?.groupImageLink || undefined }}
-          style={styles.groupImage}
-        />
-        <Text>{groupItem?.groupName}</Text>
-        <Text>{groupItem?.groupDescription}</Text>
-        <Text>현재 인원 {currentCount}명</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.arrow_container}>
+        <Pressable style={styles.arrow_icon} onPress={() => router.back()}>
+          <Feather name="arrow-left" size={32} color="black" />
+        </Pressable>
+        <Pressable onPress={handleGroupEdit}>
+          <Text style={{ textAlign: 'right' }}>그룹 수정</Text>
+        </Pressable>
       </View>
-      <Pressable onPress={() => handleDeleteGroup(groupId, runnerId)}>
-        <Text>그룹 삭제하기</Text>
-      </Pressable>
+      <View style={styles.groupInfo_container}>
+        <View style={styles.iconWrapper}>
+          <Image
+            source={{ uri: groupItem?.groupImageLink || undefined }}
+            style={styles.groupImage}
+          />
+        </View>
+        <View style={styles.textWrapper}>
+          <Text style={styles.groupName}>{groupItem?.groupName}</Text>
+          <Text style={styles.groupDescription}>
+            {groupItem?.groupDescription}
+          </Text>
+        </View>
+      </View>
+
+      <View>
+        <Text style={styles.memberText}>멤버</Text>
+
+        <View>
+          {runners?.map((runner: User) => (
+            <GroupMemberItem
+              key={runner.runnerId}
+              runner={runner}
+              isLeader={isLeader}
+              isTargetLeader={runner.leader === true}
+              onChangeLeader={handleUpdateLeader}
+            />
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.bottom}>
+        <View style={styles.bottomButton}>
+          <Pressable onPress={() => setIsRequestModalOpen(true)}>
+            <Text style={styles.groupRequestListText}>그룹 신청 명단</Text>
+          </Pressable>
+          <Modal
+            visible={isRequestModalOpen}
+            animationType="slide"
+            onRequestClose={() => setIsRequestModalOpen(false)}
+          >
+            <SafeAreaView style={{ flex: 1 }}>
+              <View style={{ flex: 1, padding: 20 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 20,
+                  }}
+                >
+                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                    그룹 신청 명단
+                  </Text>
+                  <Pressable onPress={() => setIsRequestModalOpen(false)}>
+                    <Text style={{ fontSize: 18 }}>X</Text>
+                  </Pressable>
+                </View>
+
+                <ScrollView>
+                  {(requestList?.length ?? 0) > 0 ? (
+                    requestList.map((item: JoinRequest) => (
+                      <View
+                        key={item.joinRequestId}
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingVertical: 12,
+                          borderBottomWidth: 1,
+                          borderColor: '#eee',
+                        }}
+                      >
+                        <Text>{item.runnerName}</Text>
+                        <View style={{ flexDirection: 'row', gap: 10 }}>
+                          <Pressable
+                            style={{
+                              backgroundColor: 'green',
+                              padding: 8,
+                              borderRadius: 6,
+                            }}
+                            onPress={() =>
+                              handleAcceptRequest(item.joinRequestId)
+                            }
+                          >
+                            <Text style={{ color: 'white' }}>승인</Text>
+                          </Pressable>
+                          <Pressable
+                            style={{
+                              backgroundColor: 'red',
+                              padding: 8,
+                              borderRadius: 6,
+                            }}
+                            onPress={() =>
+                              handleRejectRequest(item.joinRequestId)
+                            }
+                          >
+                            <Text style={{ color: 'white' }}>거절</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    ))
+                  ) : (
+                    <View style={{ alignItems: 'center', marginTop: 40 }}>
+                      <Text style={{ color: 'gray' }}>
+                        그룹 신청자가 없습니다.
+                      </Text>
+                    </View>
+                  )}
+                </ScrollView>
+              </View>
+            </SafeAreaView>
+          </Modal>
+
+          <Pressable onPress={() => handleQuitGroup(groupId)}>
+            <Text style={styles.groupDeleteText}>그룹 탈퇴하기</Text>
+          </Pressable>
+          <Pressable onPress={() => handleDeleteGroup(groupId)}>
+            <Text style={styles.groupDeleteText}>그룹 삭제하기</Text>
+          </Pressable>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  arrow_container: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+  },
   groupImage: {
-    width: 100,
-    height: 100,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+
     borderRadius: 60,
+  },
+  arrow_icon: {
+    marginLeft: 5,
+    width: 48,
+    alignItems: 'center',
+  },
+  groupInfo_container: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    overflow: 'hidden',
+    borderBottomWidth: 0.7,
+    borderColor: colors.GRAY_FONT,
+    paddingBottom: 20,
+  },
+  iconWrapper: {
+    width: 70,
+    height: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  textWrapper: {
+    marginTop: 10,
+    gap: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  groupName: {
+    fontSize: 18,
+    fontFamily: 'pretendard500',
+  },
+  groupDescription: {
+    color: colors.GRAY_FONT,
+  },
+  bottom: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  bottomButton: {
+    paddingBottom: 20,
+    borderTopWidth: 0.7,
+    borderColor: colors.GRAY_FONT,
+  },
+  memberText: {
+    fontSize: 14,
+    fontFamily: 'pretendard500',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  memberInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  memberImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 60,
+  },
+  groupRequestListText: {
+    color: colors.BLACK,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+  },
+  groupDeleteText: {
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    color: colors.RED,
   },
 });

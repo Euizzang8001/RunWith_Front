@@ -1,22 +1,23 @@
 import { colors } from '@/constants';
 import { useGetGroupInRunner } from '@/hooks/queries/use-get-group-in-runner.data';
-import { useGetGroups } from '@/hooks/queries/use-get-group.data';
+import { useGetMineGroups } from '@/hooks/queries/use-get-mine-groups.data';
 import { useUserSession } from '@/store/useAuthStore';
 import { useScheduleStore } from '@/store/useScheduleStore';
-import { Schedule } from '@/types';
+import { Schedule, User } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-type Runner = {
-  runnerId: string;
-  groupNickname: string;
-  runnerName: string;
-  name?: string;
-};
 
 export default function GroupDetail() {
   const user = useUserSession();
@@ -32,8 +33,8 @@ export default function GroupDetail() {
   const { groupId } = useLocalSearchParams<{
     groupId: string;
   }>();
-  const { data: groups } = useGetGroups();
-  const { data: runners } = useGetGroupInRunner(groupId);
+  const { data: groups } = useGetMineGroups(user?.token || '');
+  const { data: runners } = useGetGroupInRunner(groupId, user?.token || '');
 
   const group = groups?.find((item: any) => String(item.groupId) === groupId);
 
@@ -43,36 +44,29 @@ export default function GroupDetail() {
       return;
     }
 
-    const myInfo = runners?.find(
-      (runner: Runner) => runner.runnerId === user?.runnerId,
-    );
+    const myInfo = runners?.find((runner: User) => runner.token === user.token);
 
     router.push({
       pathname: '/(tabs)/group/groupOptions',
       params: {
         groupId: group?.groupId,
-        runnerId: myInfo?.runnerId,
+        token: myInfo?.token,
       },
     });
   };
+
+  const defaultImage = require('@/assets/images/default-avatar.jpg');
 
   const selectedUserSchedules = useMemo(() => {
     if (!selectedUser) return [];
 
     return schedules.filter(
       (schedule) =>
-        schedule.runnerId === selectedUser &&
+        schedule.token === selectedUser &&
         schedule.date === today &&
         schedule.groupId === groupId,
     );
   }, [selectedUser, schedules, today, groupId]);
-
-  // 그룹 러너 로그 찍기
-  // useEffect(() => {
-  //   if (runners && runners.length > 0) {
-  //     console.log('러너 데이터:', runners[0]);
-  //   }
-  // }, [runners]);
 
   if (!group)
     return (
@@ -82,8 +76,13 @@ export default function GroupDetail() {
     );
 
   const selectedUserName = runners?.find(
-    (user: Runner) => user.runnerId === selectedUser,
-  )?.runnerName;
+    (runner: User) => runner.runnerId === selectedUser,
+  );
+
+  const displayName =
+    selectedUserName?.belongNickname ||
+    selectedUserName?.groupNickname ||
+    selectedUserName?.runnerName;
 
   return (
     <SafeAreaView>
@@ -100,16 +99,23 @@ export default function GroupDetail() {
       </View>
 
       <View style={styles.user_icon_Wrapper}>
-        {runners?.map((user: Runner) => {
-          const isSelected = selectedUser === user.runnerId;
+        {runners?.map((runner: User) => {
+          const isSelected = selectedUser === runner.runnerId;
 
           return (
             <Pressable
-              key={user.runnerId}
-              onPress={() => setSelectedUser(user.runnerId)}
+              key={runner.runnerId}
+              onPress={() => setSelectedUser(runner.runnerId)}
               style={[styles.user_icon, isSelected && styles.userSelcetd]}
             >
-              <Feather name="user" size={24} color={'black'} />
+              <Image
+                source={
+                  runner.runnerImageLink
+                    ? { uri: runner.runnerImageLink }
+                    : defaultImage
+                }
+                style={styles.memberImage}
+              />
             </Pressable>
           );
         })}
@@ -118,8 +124,8 @@ export default function GroupDetail() {
         {selectedUser !== null ? (
           <View>
             <Text style={styles.seletedUserText}>
-              {selectedUserName
-                ? `${selectedUserName}의 일정`
+              {displayName
+                ? `${displayName}의 일정`
                 : '닉네임을 불러 올 수 없습니다.'}
             </Text>
 
@@ -214,6 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.GRAY,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   userSelcetd: {
     borderWidth: 2,
@@ -239,5 +246,10 @@ const styles = StyleSheet.create({
     marginTop: 30,
     width: '100%',
     textAlign: 'center',
+  },
+  memberImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 60,
   },
 });
