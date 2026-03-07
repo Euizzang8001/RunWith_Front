@@ -2,9 +2,10 @@ import { getGroups } from '@/api/group';
 import { QUERY_KEYS } from '@/lib/constants';
 import { useQuery } from '@tanstack/react-query';
 
-export function useGetGroups() {
+export function useGetGroups(token: string, groupName: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.group.list,
-    queryFn: getGroups,
+    queryKey: QUERY_KEYS.group.searchGroups(token, groupName),
+    queryFn: () => getGroups(token, groupName),
+    enabled: !!token || !!groupName,
   });
 }
