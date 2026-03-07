@@ -9,7 +9,7 @@ export function useCreateGroup(callbacks?: UseMutaionCallback) {
   return useMutation({
     mutationFn: createGroup,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.group.list });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.group.all });
 
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },

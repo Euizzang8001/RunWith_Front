@@ -1,15 +1,15 @@
-import { deleteGroup } from '@/api/group';
+import { updateGroup } from '@/api/group';
 import { QUERY_KEYS } from '@/lib/constants';
 import { UseMutaionCallback } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export function useDeleteGroup(callbacks?: UseMutaionCallback) {
+export function useUpdateGroup(callbacks?: UseMutaionCallback) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteGroup,
+    mutationFn: updateGroup,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.group.list });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.group.all });
 
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
