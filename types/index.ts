@@ -1,22 +1,34 @@
 interface User {
+  token: string;
   runnerId: string;
   runnerName: string;
+  groupNickname?: string;
+  belongNickname?: string;
   runnerImageLink: string;
+  leader: boolean;
+  isExist: boolean;
 }
 
 interface GroupInfo {
   groupId: string;
   groupDescription: string;
-  groupImageLink: string | null;
+  groupImageLink: string;
   groupName: string;
-  // participants?: string[];
-  // capacity?: number;
+  token: string;
+}
+
+interface JoinRequest {
+  groupId: string;
+  groupName: string;
+  joinRequestId: string;
+  token: string;
+  runnerName: string;
 }
 
 interface Schedule {
   id: string;
   groupId: string;
-  runnerId: string;
+  token: string;
   title: string;
   date: string;
   startTime: string;
@@ -37,4 +49,11 @@ type UseMutaionCallback = {
   onSetteld?: () => void;
 };
 
-export type { Feed, GroupInfo, Schedule, UseMutaionCallback, User };
+export type {
+  Feed,
+  GroupInfo,
+  JoinRequest,
+  Schedule,
+  UseMutaionCallback,
+  User,
+};
