@@ -3,7 +3,9 @@ import ImageViewer from '@/components/Image/ImageViewer';
 import InputField from '@/components/InputField';
 import Loader from '@/components/Loader';
 import { useSignUp } from '@/hooks/mutations/auth/use-sign-up';
-import { useAuthActions } from '@/store/useAuthStore';
+import { useUpdateRunnersInfo } from '@/hooks/mutations/runners/use-update-runners-info';
+import { useAuthActions, useUserSession } from '@/store/useAuthStore';
+import auth from '@react-native-firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -18,13 +20,18 @@ import {
   View,
 } from 'react-native';
 
-export default function SignUpPassword() {
+export default function NicknameSetting() {
+  const user = useUserSession();
   const { setLogin } = useAuthActions();
 
-  const { runnerEmail } = useLocalSearchParams<{ runnerEmail: string }>();
-  const [runnerName, setRunnerName] = useState('');
-  const [runnerPassword, setRunnerPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const params = useLocalSearchParams<{
+    mode?: string;
+    prevRunnerNickname?: string;
+    prevRunnerImageLink: string;
+  }>();
+  const isEditMode = params.mode === 'edit';
+
+  const [runnerName, setRunnerName] = useState(params.prevRunnerNickname || '');
   const [selectedImage, setSelectedImage] = useState<
     ImagePicker.ImagePickerAsset | undefined
   >(undefined);
@@ -42,45 +49,77 @@ export default function SignUpPassword() {
   };
 
   const defaultImage = require('@/assets/images/default-avatar.jpg');
+  const profileImage = selectedImage?.uri || params.prevRunnerImageLink;
 
+  // 회원가입
   const { mutate: signUp, isPending } = useSignUp({
     onSuccess: (data) => {
       console.log('직접 확인 성공:', data);
       setLogin(data);
-      Alert.alert('회원가입 성공');
+      Alert.alert('닉네임 설정 성공');
       router.replace('/(tabs)');
     },
     onError: (error) => {
       console.log('에러 상세 내용:', error);
-      Alert.alert('회원가입 실패', error.message);
-      router.back();
+      Alert.alert('닉네임 설정 실패', error.message);
+      router.replace('/auth/signIn');
     },
   });
 
-  const handleSignUp = () => {
-    if (!runnerEmail) {
-      Alert.alert('이메일 정보가 없습니다.');
-      return;
-    }
-    if (runnerPassword !== confirmPassword) {
-      Alert.alert('비밀번호가 일치하지 않습니다.');
-      return;
-    }
+  // 러너 수정 뮤테이션
+  const { mutate: updateRunner } = useUpdateRunnersInfo({
+    onError: (error) => {
+      Alert.alert('수정 실패', error.message);
+    },
+  });
+
+  const handleSignUp = async () => {
     if (runnerName.trim() === '') {
-      Alert.alert('이름을 입력해 주세요.');
-      return;
-    }
-    if (runnerPassword.trim() === '') {
-      Alert.alert('비밀번호를 입력해 주세요.');
+      Alert.alert('닉네임을 입력해 주세요.');
       return;
     }
 
-    signUp({
-      runnerEmail,
-      runnerName,
-      runnerPassword,
-      runnerImageLink: selectedImage,
-    });
+    try {
+      const firebaseUser = await auth().currentUser;
+
+      if (!firebaseUser) {
+        Alert.alert('인증 정보가 만료되었습니다. 다시 로그인해 주세요.');
+        router.replace('/auth/signIn');
+        return;
+      }
+
+      const token = await firebaseUser.getIdToken(true);
+      console.log(auth().currentUser);
+      console.log('보내는 토큰:', token);
+      console.log(typeof token);
+      if (isEditMode) {
+        updateRunner(
+          {
+            runnerName,
+            runnerImageLink: selectedImage,
+            token,
+          },
+          {
+            onSuccess: (data) => {
+              setLogin({
+                token: token,
+                ...data,
+              });
+              Alert.alert('수정 완료', '프로필이 변경되었습니다.');
+              router.back();
+            },
+          },
+        );
+      } else {
+        signUp({
+          runnerName,
+          runnerImageLink: selectedImage,
+          token,
+        });
+      }
+    } catch (error) {
+      console.error('토큰 가져오기 실패:', error);
+    }
   };
   return (
     <KeyboardAvoidingView
@@ -89,7 +128,9 @@ export default function SignUpPassword() {
     >
       <Loader visible={isPending} />
       <View style={styles.title}>
-        <Text style={styles.font}>회원가입</Text>
+        <Text style={styles.font}>
+          {isEditMode ? '내 정보 수정' : '내 정보 설정'}
+        </Text>
       </View>
 
       <ScrollView
@@ -101,7 +142,7 @@ export default function SignUpPassword() {
           <View>
             <ImageViewer
               defaultImage={defaultImage}
-              selectedImage={selectedImage?.uri}
+              selectedImage={profileImage}
             />
           </View>
         </Pressable>
@@ -111,25 +152,13 @@ export default function SignUpPassword() {
             onChangeText={setRunnerName}
             placeholder="닉네임을 입력해 주세요."
           />
-          <InputField
-            secureTextEntry
-            value={runnerPassword}
-            onChangeText={setRunnerPassword}
-            placeholder="비밀번호를 입력해 주세요."
-          />
-          <InputField
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="비밀번호를 다시 입력해 주세요."
-          />
         </View>
       </ScrollView>
 
       <View style={styles.fixed}>
         <CustomButton
           disabled={isPending}
-          label="확인"
+          label={isEditMode ? '수정' : '확인'}
           size="large"
           variant="filled"
           textVariant="textFilled"
