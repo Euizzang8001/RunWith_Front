@@ -20,9 +20,7 @@ export const useAuthStore = create(
         setLogOut: () => set({ user: null, isLoaded: true }),
       },
     })),
-    {
-      name: 'authStore',
-    },
+    { name: 'authStore' },
   ),
 );
 
