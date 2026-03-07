@@ -26,7 +26,7 @@ export default function GroupItem({ group }: GroupListProps) {
           <View style={styles.info}>
             <Image
               source={
-                group.groupImageLink
+                group.groupImageLink && group.groupImageLink.trim().length > 0
                   ? { uri: group.groupImageLink }
                   : defaultGroupImage
               }
@@ -65,10 +65,12 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 20,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   groupImage: {
     width: 50,
     height: 50,
     borderRadius: 24,
+    resizeMode: 'cover',
   },
 });
