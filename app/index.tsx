@@ -20,7 +20,7 @@ export default function Index() {
       }
       // 2. 로그인은 됐는데 유저 정보(이름)가 없는 경우 -> 닉네임 설정으로
       else if (currentUser && !userSession?.runnerName) {
-        router.replace('/auth/nicknameSetting');
+        router.replace('/auth/profileSetting');
       }
     });
 
