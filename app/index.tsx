@@ -2,7 +2,7 @@ import { useAuthStore, useUserSession } from '@/store/useAuthStore';
 import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import LoginScreen from './auth/signIn'; // LoginScreen 내부 어딘가에 GoogleLogin이 있음
+import LoginScreen from './auth/signIn';
 
 export default function Index() {
   const router = useRouter();
