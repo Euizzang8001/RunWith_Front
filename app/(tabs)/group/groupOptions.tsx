@@ -219,7 +219,7 @@ export default function GroupOptions() {
       </View>
       <View style={styles.groupInfo_container}>
         <View style={styles.iconWrapper}>
-          <GroupImage uri={groupItem.groupImageLink} size={50} />
+          <GroupImage uri={groupItem?.groupImageLink} size={50} />
         </View>
         <View style={styles.textWrapper}>
           <Text style={styles.groupName}>{groupItem?.groupName}</Text>
