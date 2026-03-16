@@ -1,5 +1,5 @@
 import { colors } from '@/constants';
-import { useGetMineGroups } from '@/hooks/queries/use-get-mine-groups.data';
+import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
 import { useUserSession } from '@/store/useAuthStore';
 import {
   useActionsSchedules,
@@ -22,16 +22,25 @@ export default function FeedList() {
   const user = useUserSession();
   const { data: groups } = useGetMineGroups(user?.token || '');
   const { schedules } = useScheduleStore();
-  const { updateSchedule } = useActionsSchedules();
+  const { updateScheduleStore } = useActionsSchedules();
 
   const [refreshing, setRefreshing] = useState(false);
   const [selecetdFeed, setSelectedFeed] = useState<Schedule | null>(null);
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date();
+
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const date = today.getDate();
 
   const todaySchedule = useMemo(() => {
-    return schedules.filter((item) => item.date === today);
+    return schedules.filter(
+      (item) =>
+        item.scheduleYear === year &&
+        item.scheduleMonth === month &&
+        item.scheduleDate === date,
+    );
   }, [schedules, today]);
 
   const onRefresh = async () => {
@@ -56,7 +65,7 @@ export default function FeedList() {
   }) => {
     if (!selecetdFeed) return;
 
-    updateSchedule(selecetdFeed?.id, { groupId: groupId });
+    updateScheduleStore(selecetdFeed?.scheduleId, { groupId: groupId });
     Alert.alert('연동 완료', `${groupName} 그룹에 일정이 연동 되었습니다.`);
     setIsGroupModalOpen(false);
   };
@@ -67,13 +76,13 @@ export default function FeedList() {
         data={todaySchedule}
         renderItem={({ item }) => (
           <FeedItem
-            post={item}
+            schedule={item}
             onPress={() => {
               handleOpenFeed(item);
             }}
           />
         )}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => String(item.scheduleId)}
         contentContainerStyle={styles.contentContainerStyle}
         refreshing={refreshing}
         onRefresh={onRefresh}

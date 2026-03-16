@@ -3,20 +3,17 @@ import { Schedule } from '@/types';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type FeedItemProps = {
-  post: Schedule;
+  schedule: Schedule;
   onPress: () => void;
 };
 
-export default function FeedItem({ post, onPress }: FeedItemProps) {
+export default function FeedItem({ schedule, onPress }: FeedItemProps) {
   return (
     <Pressable onPress={onPress}>
       <View style={styles.container}>
         <View style={styles.item}>
           <View style={styles.info}>
-            <Text style={styles.title}>{post.title}</Text>
-            <Text>
-              {post.startTime} ~ {post.endTime}
-            </Text>
+            <Text style={styles.title}>{schedule.scheduleDescription}</Text>
           </View>
         </View>
       </View>
