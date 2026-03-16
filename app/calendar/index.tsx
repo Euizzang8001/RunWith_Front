@@ -1,10 +1,15 @@
-import CalendarScreen from '@/components/Calendar/CalendarScreen';
+import CalendarView from '@/components/Calendar/CalendarView';
 import Feather from '@expo/vector-icons/Feather';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CalendarPage() {
+  const { belongId, runnerId } = useLocalSearchParams<{
+    belongId: string;
+    runnerId: string;
+  }>();
+
   return (
     <SafeAreaView>
       <View style={styles.container_top}>
@@ -17,7 +22,7 @@ export default function CalendarPage() {
         <View style={styles.right} />
       </View>
       <View>
-        <CalendarScreen />
+        <CalendarView belongId={belongId} runnerId={runnerId} />
       </View>
     </SafeAreaView>
   );
