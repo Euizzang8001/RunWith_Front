@@ -10,10 +10,12 @@ import {
 
 type State = {
   schedules: Schedule[];
+  latestScheduleId: string | null;
 };
 
 const intialState = {
   schedules: [],
+  latestScheduleId: null,
 } as State;
 
 export const useScheduleStore = create(
@@ -21,22 +23,30 @@ export const useScheduleStore = create(
     persist(
       combine(intialState, (set) => ({
         actions: {
-          addSchedule: (newContent: Omit<Schedule, 'id'>) =>
+          setLatestScheduleId: (scheduleId: string | null) =>
+            set({ latestScheduleId: scheduleId }),
+
+          addScheduleStore: (newContent: Omit<Schedule, 'scheduleId'>) =>
             set((state) => ({
               schedules: [
                 ...state.schedules,
-                { ...newContent, id: `${Date.now()}-${Math.random()}` },
+                { ...newContent, scheduleId: `${Date.now()}-${Math.random()}` },
               ],
             })),
 
-          deleteSchedule: (id: string) =>
+          deleteScheduleStore: (scheduleId: string) =>
             set((state) => ({
-              schedules: state.schedules.filter((item) => item.id !== id),
+              schedules: state.schedules.filter(
+                (item) => item.scheduleId !== scheduleId,
+              ),
             })),
-          updateSchedule: (id: string, updates: Partial<Schedule>) =>
+          updateScheduleStore: (
+            scheduleId: string,
+            updates: Partial<Schedule>,
+          ) =>
             set((state) => ({
               schedules: state.schedules.map((item) =>
-                item.id === id ? { ...item, ...updates } : item,
+                item.scheduleId === scheduleId ? { ...item, ...updates } : item,
               ),
             })),
         },
@@ -46,6 +56,7 @@ export const useScheduleStore = create(
         storage: createJSONStorage(() => AsyncStorage),
         partialize: (store) => ({
           schedules: store.schedules,
+          latestScheduleId: store.latestScheduleId,
         }),
       },
     ),
@@ -60,4 +71,9 @@ export const useSchedules = () => {
 export const useActionsSchedules = () => {
   const actionsSchedules = useScheduleStore((store) => store.actions);
   return actionsSchedules;
+};
+
+export const useLatestScheduleId = () => {
+  const latestScheduleId = useScheduleStore((store) => store.latestScheduleId);
+  return latestScheduleId;
 };
