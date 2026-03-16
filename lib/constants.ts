@@ -12,6 +12,7 @@ export const QUERY_KEYS = {
       runnerId,
     ],
     mineGroups: (token: string) => ['group', 'mine', token],
+    selfGroups: (token: string) => ['group', 'self', token],
     searchGroups: (token: string, groupName: string) => [
       'group',
       'search',
@@ -38,5 +39,14 @@ export const QUERY_KEYS = {
       groupId,
     ],
     mineRequestList: (token: string) => ['request', 'mine', token],
+  },
+  schedule: {
+    all: ['schedule'],
+    list: ['schedule', 'list'],
+  },
+  actions: {
+    all: ['actions'],
+    list: ['actions', 'list'],
+    actionsList: (scheduleId: string) => ['actions', 'list', scheduleId],
   },
 };
