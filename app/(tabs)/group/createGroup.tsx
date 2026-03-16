@@ -1,10 +1,9 @@
 import ImageViewer from '@/components/Image/ImageViewer';
 import InputField from '@/components/InputField';
 import Loader from '@/components/Loader';
-import { colors } from '@/constants';
 import { useCreateGroup } from '@/hooks/mutations/group/use-create-group';
 import { useUpdateGroup } from '@/hooks/mutations/group/use-update-groups';
-import { useGetGroups } from '@/hooks/queries/use-get-group.data';
+import { useGetGroups } from '@/hooks/queries/group/use-get-group.data';
 import { useAuthActions, useUserSession } from '@/store/useAuthStore';
 import { GroupInfo } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
@@ -12,8 +11,9 @@ import auth from '@react-native-firebase/auth';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { styles } from '../../../styles/group/createGroup-styles';
 
 export default function CreateGroup() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
@@ -188,52 +188,3 @@ export default function CreateGroup() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container_top: {
-    paddingTop: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingBottom: 50,
-    justifyContent: 'space-between',
-  },
-  header: {
-    flex: 1,
-    fontSize: 18,
-    fontFamily: 'pretendard500',
-    textAlign: 'center',
-  },
-  arrow_icon: {
-    marginLeft: 5,
-    width: 80,
-    alignItems: 'center',
-  },
-  inputWrapper: {
-    marginTop: 20,
-    gap: 30,
-  },
-  createButton: {
-    marginTop: 40,
-    alignItems: 'center',
-  },
-  createButtonText: {
-    fontFamily: 'pretendard500',
-    fontSize: 16,
-    backgroundColor: colors.BLUE,
-    color: colors.WHITE,
-    padding: 20,
-    borderRadius: 24,
-  },
-  image_wrapper: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  participate: {
-    right: 10,
-    padding: 10,
-  },
-  sideArea: {
-    width: 80,
-  },
-});

@@ -1,21 +1,14 @@
 import InputField from '@/components/InputField';
 import { colors } from '@/constants';
 import { useJoinRequest } from '@/hooks/mutations/join/use-join-request';
-import { useGetGroups } from '@/hooks/queries/use-get-group.data';
+import { useGetGroups } from '@/hooks/queries/group/use-get-group.data';
 import { useUserSession } from '@/store/useAuthStore';
+import { styles } from '@/styles/group/joinGroup-styles';
 import { GroupInfo } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import {
-  Alert,
-  FlatList,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, FlatList, Keyboard, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function JoinGroup() {
@@ -114,48 +107,3 @@ export default function JoinGroup() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
-  container_top: {
-    paddingTop: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingBottom: 50,
-  },
-  header: {
-    flex: 1,
-    fontSize: 18,
-    fontFamily: 'pretendard500',
-    textAlign: 'center',
-  },
-  arrow_icon: {
-    marginLeft: 5,
-    width: 48,
-    alignItems: 'center',
-  },
-  right: {
-    width: 48,
-  },
-  inputWrapper: {
-    marginTop: 20,
-    gap: 30,
-  },
-  JoinButton: {
-    marginTop: 40,
-    alignItems: 'center',
-  },
-  joinButtonText: {
-    fontFamily: 'pretendard500',
-    fontSize: 16,
-    backgroundColor: colors.BLUE,
-    color: colors.WHITE,
-    padding: 20,
-    borderRadius: 24,
-  },
-  image_wrapper: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-});

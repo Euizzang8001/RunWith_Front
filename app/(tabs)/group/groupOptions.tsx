@@ -1,30 +1,22 @@
 import GroupMemberItem from '@/components/Group/GroupMemberItem';
-import { colors } from '@/constants';
 import { useQuitGroup } from '@/hooks/mutations/belongs/use-delete-join-group';
 import { useUpdateLeader } from '@/hooks/mutations/belongs/use-update-leader';
 import { useDeleteGroup } from '@/hooks/mutations/group/use-delete-group';
 import { useAccpetJoinRequest } from '@/hooks/mutations/join/use-accpet-join-request';
 import { useRejectJoinRequest } from '@/hooks/mutations/join/use-reject-join-requset';
+import { useGetGroupInRunner } from '@/hooks/queries/group/use-get-group-in-runner.data';
+import { useGetGroups } from '@/hooks/queries/group/use-get-group.data';
 import { useGetJoinRequestList } from '@/hooks/queries/join/use-get-join-request-list.data';
-import { useGetGroupInRunner } from '@/hooks/queries/use-get-group-in-runner.data';
-import { useGetGroups } from '@/hooks/queries/use-get-group.data';
 import { useUserSession } from '@/store/useAuthStore';
 import { JoinRequest, User } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import auth from '@react-native-firebase/auth';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import {
-  Alert,
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
+import { GroupImage } from '@/components/GroupImage';
+import { styles } from '@/styles/group/groupOptions-styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function GroupOptions() {
@@ -215,11 +207,6 @@ export default function GroupOptions() {
   );
   const { data: runners } = useGetGroupInRunner(groupId, user?.token || '');
 
-  console.log('리더:', {
-    myLeaderStatus: isLeader,
-    runnersCount: getGroupInRunner?.length,
-  });
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.arrow_container}>
@@ -232,10 +219,7 @@ export default function GroupOptions() {
       </View>
       <View style={styles.groupInfo_container}>
         <View style={styles.iconWrapper}>
-          <Image
-            source={{ uri: groupItem?.groupImageLink || undefined }}
-            style={styles.groupImage}
-          />
+          <GroupImage uri={groupItem.groupImageLink} size={50} />
         </View>
         <View style={styles.textWrapper}>
           <Text style={styles.groupName}>{groupItem?.groupName}</Text>
@@ -355,90 +339,3 @@ export default function GroupOptions() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  arrow_container: {
-    marginTop: 30,
-    paddingHorizontal: 20,
-  },
-  groupImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-
-    borderRadius: 60,
-  },
-  arrow_icon: {
-    marginLeft: 5,
-    width: 48,
-    alignItems: 'center',
-  },
-  groupInfo_container: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    overflow: 'hidden',
-    borderBottomWidth: 0.7,
-    borderColor: colors.GRAY_FONT,
-    paddingBottom: 20,
-  },
-  iconWrapper: {
-    width: 70,
-    height: 70,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  textWrapper: {
-    marginTop: 10,
-    gap: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  groupName: {
-    fontSize: 18,
-    fontFamily: 'pretendard500',
-  },
-  groupDescription: {
-    color: colors.GRAY_FONT,
-  },
-  bottom: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  bottomButton: {
-    paddingBottom: 20,
-    borderTopWidth: 0.7,
-    borderColor: colors.GRAY_FONT,
-  },
-  memberText: {
-    fontSize: 14,
-    fontFamily: 'pretendard500',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  memberInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  memberImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 60,
-  },
-  groupRequestListText: {
-    color: colors.BLACK,
-    paddingTop: 20,
-    paddingHorizontal: 20,
-  },
-  groupDeleteText: {
-    paddingTop: 20,
-    paddingHorizontal: 20,
-    color: colors.RED,
-  },
-});
