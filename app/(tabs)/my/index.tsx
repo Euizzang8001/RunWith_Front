@@ -1,13 +1,13 @@
-import { colors } from '@/constants';
+import { ProfileImage } from '@/components/ProfileImage';
 import { useGetMineRequestList } from '@/hooks/queries/join/use-get-mine-join-request.data';
 import { useAuthActions, useUserSession } from '@/store/useAuthStore';
+import { styles } from '@/styles/my/my-styles';
 import { JoinRequest } from '@/types';
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-
+import { router } from 'expo-router';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MyScreen() {
@@ -16,11 +16,9 @@ export default function MyScreen() {
   const queryClient = useQueryClient();
 
   const { data: mineRequestGroup } = useGetMineRequestList(user?.token || '');
-  const { groupId } = useLocalSearchParams<{ groupId: string }>();
-
   const handleEditNickname = () => {
     router.push({
-      pathname: '/auth/nicknameSetting',
+      pathname: '/auth/profileSetting',
       params: {
         mode: 'edit',
         prevRunnerNickname: user?.runnerName,
@@ -57,17 +55,6 @@ export default function MyScreen() {
     ]);
   };
 
-  const defaultImage = require('@/assets/images/default-avatar.jpg');
-
-  const getProfileSource = () => {
-    const link = user?.runnerImageLink;
-
-    if (!link) {
-      return defaultImage;
-    }
-    return { uri: link };
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container_top}>
@@ -76,7 +63,7 @@ export default function MyScreen() {
 
       <View style={styles.user}>
         <View style={styles.iconWrapper}>
-          <Image source={getProfileSource()} style={styles.profileImage} />
+          <ProfileImage uri={user?.runnerImageLink} size={80} />
         </View>
         <View style={styles.textWrapper}>
           <Text style={{ fontFamily: 'pretendard400', fontSize: 16 }}>
@@ -121,60 +108,3 @@ export default function MyScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container_top: {
-    paddingTop: 25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  header: {
-    flex: 1,
-    fontSize: 18,
-    fontFamily: 'pretendard500',
-    textAlign: 'center',
-  },
-  user: {
-    flexDirection: 'row',
-    paddingTop: 30,
-  },
-  iconWrapper: {
-    marginLeft: 30,
-    width: 100,
-    height: 100,
-    borderRadius: 60,
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  profileImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-    borderRadius: 60,
-  },
-  textWrapper: {
-    marginTop: 20,
-    marginLeft: 20,
-    gap: 30,
-  },
-  setting_space: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  setting_container: {
-    bottom: 0,
-  },
-  logOut: {
-    padding: 16,
-  },
-  logOut_text: {
-    textAlign: 'left',
-    color: colors.RED,
-  },
-});
