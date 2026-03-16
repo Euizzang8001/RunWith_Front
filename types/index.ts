@@ -10,6 +10,7 @@ interface User {
 }
 
 interface GroupInfo {
+  belongId?: string;
   groupId: string;
   groupDescription: string;
   groupImageLink: string;
@@ -26,20 +27,26 @@ interface JoinRequest {
 }
 
 interface Schedule {
-  id: string;
+  scheduleId: string;
+  runnerId: string;
+  belongId: string;
   groupId: string;
-  token: string;
-  title: string;
-  date: string;
-  startTime: string;
-  endTime: string;
+  scheduleDescription: string;
+  scheduleYear: number;
+  scheduleMonth: number;
+  scheduleDate: number;
 }
 
-interface Feed {
-  title: string;
-  startTime: number;
-  endTime: number;
-  description: string;
+interface Actions {
+  token: string;
+  actionId: string;
+  scheduleId: string;
+  actionName: string;
+  actionDescription: string;
+  actionStartHour: number;
+  actionStartMinute: number;
+  actionEndHour: number;
+  actionEndMinute: number;
 }
 
 type UseMutaionCallback = {
@@ -50,7 +57,7 @@ type UseMutaionCallback = {
 };
 
 export type {
-  Feed,
+  Actions,
   GroupInfo,
   JoinRequest,
   Schedule,
