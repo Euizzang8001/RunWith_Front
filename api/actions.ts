@@ -1,7 +1,13 @@
 // 액션 조회
-export async function getActions({ token }: { token: string }) {
+export async function getActions({
+  token,
+  scheduleId,
+}: {
+  token: string;
+  scheduleId: string;
+}) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/actions`,
+    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/actions?scheduleId=${scheduleId}`,
     {
       method: 'GET',
       headers: {
@@ -10,10 +16,10 @@ export async function getActions({ token }: { token: string }) {
       },
     },
   );
-  console.log('액션 조회 오류 코드', response.status);
   if (!response.ok) {
     throw new Error('액션 조회 오류');
   }
+  return response.json();
 }
 
 // 액션 생성
@@ -46,7 +52,7 @@ export async function createActions({
     formData.append('image', {
       uri: actionImageLink.uri,
       name: actionImageLink.fileName || 'group_image.jpg',
-      type: actionImageLink.mimeType || 'image/jpe',
+      type: actionImageLink.mimeType || 'image/jpeg',
     } as any);
   }
 
@@ -124,10 +130,10 @@ export async function deleteActions({
       },
     },
   );
-  console.log('액션 삭제 오류 코드', response.status);
   if (!response.ok) {
     throw new Error('액션 삭제 오류');
   }
+  return response.json();
 }
 
 // 액션 수정하기
