@@ -11,7 +11,6 @@ export async function getSchedules(token: string) {
     },
   );
 
-  console.log('스케줄 조회 오류 코드', response.status);
   if (!response.ok) {
     throw new Error('스케줄 조회 오류');
   }
@@ -23,16 +22,16 @@ export async function createSchedules({
   token,
   belongId,
   scheduleYear,
-  schduleMonth,
-  schduleDate,
-  schduleDescription,
+  scheduleMonth,
+  scheduleDate,
+  scheduleDescription,
 }: {
   token: string;
   belongId: string;
   scheduleYear: number;
-  schduleMonth: number;
-  schduleDate: number;
-  schduleDescription: string;
+  scheduleMonth: number;
+  scheduleDate: number;
+  scheduleDescription: string;
 }) {
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules`,
@@ -45,17 +44,18 @@ export async function createSchedules({
       body: JSON.stringify({
         belongId,
         scheduleYear,
-        schduleMonth,
-        schduleDate,
-        schduleDescription,
+        scheduleMonth,
+        scheduleDate,
+        scheduleDescription,
       }),
     },
   );
 
-  console.log('스케줄 생성 오류 코드', response.status);
   if (!response.ok) {
+    console.log('스케줄 생성 오류 코드', response.status);
     throw new Error('스케줄 생성');
   }
+  return response.json();
 }
 
 // 스케줄 삭제
@@ -69,21 +69,21 @@ export async function deleteSchedules({
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules/${scheduleId}`,
     {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        scheduleId,
-      }),
     },
   );
 
-  console.log('스케줄 생성 오류 코드', response.status);
-  if (!response.ok) {
-    throw new Error('스케줄 생성');
+  if (response.status === 401) {
+    throw new Error('401');
   }
+  if (!response.ok) {
+    throw new Error('스케줄 삭제 오류');
+  }
+  return response.json();
 }
 
 // 스케줄 수정
