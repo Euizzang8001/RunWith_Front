@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 
 export function useGetSelfGroup(token: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.group.groupList(token),
-    queryFn: () => getSelfGroup(token),
+    queryKey: QUERY_KEYS.group.selfGroups(token),
+    queryFn: () => getSelfGroup({ token }),
     enabled: !!token,
   });
 }
