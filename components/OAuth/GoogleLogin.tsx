@@ -30,15 +30,13 @@ export default function GoogleLogin() {
   useEffect(() => {
     if (runner && firebaseToken) {
       if (runner.isExist) {
-        console.log('🔥 runnerInfo:', JSON.stringify(runnerInfo, null, 2));
+        console.log('러너 정보:', JSON.stringify(runnerInfo, null, 2));
         setLogin({ ...runnerInfo, token: firebaseToken });
         router.replace('/(tabs)');
       } else {
-        router.replace('/auth/nicknameSetting');
+        router.replace('/auth/profileSetting');
       }
     }
-
-    console.log('🔥 runner:', JSON.stringify(runner, null, 2));
 
     if (!firebaseToken) return;
   }, [runnerInfo, firebaseToken, runner]);
