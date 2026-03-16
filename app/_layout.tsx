@@ -19,7 +19,6 @@ export default function RootLayout() {
 
   const [fontLoaded, setFontLoaded] = useState(false);
   useEffect(() => {
-    // 앱 시작과 동시에 Google SDK 설정
     GoogleSignin.configure({
       webClientId:
         '221570016133-barlvpo8bvu8utpkh2k97tseudhpdf3e.apps.googleusercontent.com',
