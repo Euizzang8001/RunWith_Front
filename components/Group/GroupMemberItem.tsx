@@ -17,20 +17,19 @@ export default function GroupMemberItem({
   isTargetLeader,
   onChangeLeader,
 }: Props) {
-  const [visible, setVisible] = useState(false); // 상태 제어 전용
+  const [visible, setVisible] = useState(false);
   const defaultImage = require('@/assets/images/default-avatar.jpg');
 
   return (
     <Popover
-      isVisible={visible} // 직접 넘겨줍니다.
-      onRequestClose={() => setVisible(false)} // 배경 누르면 닫힘
+      isVisible={visible}
+      onRequestClose={() => setVisible(false)}
       from={(sourceRef) => (
         <View ref={sourceRef as any} collapsable={false}>
-          {/* collapsable={false}는 안드로이드 ref 좌표 버그 방지용 */}
           <Pressable
             onPress={() => {
               console.log(isLeader, isTargetLeader);
-              // 내가 리더이고 클릭 대상이 리더가 아닐 때만 true로 변경
+
               if (isLeader && !isTargetLeader) {
                 setVisible(true);
               }
@@ -54,7 +53,7 @@ export default function GroupMemberItem({
         <Pressable
           style={styles.popoverButton}
           onPress={() => {
-            setVisible(false); // 팝오버 닫기
+            setVisible(false);
             onChangeLeader(runner.runnerId, runner.runnerName);
           }}
         >
@@ -66,7 +65,6 @@ export default function GroupMemberItem({
 }
 
 const styles = StyleSheet.create({
-  // --- 기존 CSS 유지 ---
   memberInfo: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -82,9 +80,8 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 16,
     color: '#333',
-    // 필요시 fontFamily 추가
   },
-  // --- 팝오버 전용 CSS ---
+
   popoverContainer: {
     padding: 4,
     minWidth: 120,

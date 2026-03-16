@@ -1,5 +1,5 @@
 import { useGetSelfGroup } from '@/hooks/queries/group/use-get-mine-group.data';
-import { useGetMineGroups } from '@/hooks/queries/use-get-mine-groups.data';
+import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
 import { useUserSession } from '@/store/useAuthStore';
 import { GroupInfo } from '@/types';
 import { useMemo } from 'react';
@@ -28,6 +28,7 @@ export default function GroupList() {
       token: group.token,
     }));
   }, [joinedGroups, selfGroup]);
+  console.log('selfGroup :', selfGroup);
 
   return (
     <FlatList

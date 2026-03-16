@@ -1,15 +1,14 @@
 import { colors } from '@/constants';
 import { GroupInfo } from '@/types';
 import { router } from 'expo-router';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { GroupImage } from '../GroupImage';
 
 type GroupListProps = {
   group: GroupInfo;
 };
 
 export default function GroupItem({ group }: GroupListProps) {
-  const defaultGroupImage = require('@/assets/images/default-group-image.png');
-
   return (
     <Pressable
       onPress={() =>
@@ -24,14 +23,7 @@ export default function GroupItem({ group }: GroupListProps) {
       <View style={styles.container}>
         <View style={styles.item}>
           <View style={styles.info}>
-            <Image
-              source={
-                group.groupImageLink && group.groupImageLink.trim().length > 0
-                  ? { uri: group.groupImageLink }
-                  : defaultGroupImage
-              }
-              style={styles.groupImage}
-            />
+            <GroupImage uri={group.groupImageLink} size={50} />
             <Text style={styles.title}>{group.groupName}</Text>
           </View>
         </View>
