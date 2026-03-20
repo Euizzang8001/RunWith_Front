@@ -1,10 +1,8 @@
 import { colors } from '@/constants';
 import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
+import { useGetMySchedule } from '@/hooks/queries/schedule/use-get-my-schedule';
 import { useUserSession } from '@/store/useAuthStore';
-import {
-  useActionsSchedules,
-  useScheduleStore,
-} from '@/store/useScheduleStore';
+import { useActionsSchedules } from '@/store/useScheduleStore';
 import { GroupInfo, Schedule } from '@/types';
 import { useMemo, useState } from 'react';
 import {
@@ -21,7 +19,7 @@ import FeedItem from './FeedItem';
 export default function FeedList() {
   const user = useUserSession();
   const { data: groups } = useGetMineGroups(user?.token || '');
-  const { schedules } = useScheduleStore();
+  const { data: mySchedules = [] } = useGetMySchedule(user?.token);
   const { updateScheduleStore } = useActionsSchedules();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -35,13 +33,16 @@ export default function FeedList() {
   const date = today.getDate();
 
   const todaySchedule = useMemo(() => {
-    return schedules.filter(
-      (item) =>
-        item.scheduleYear === year &&
-        item.scheduleMonth === month &&
-        item.scheduleDate === date,
-    );
-  }, [schedules, today]);
+    if (!mySchedules) return [];
+
+    return mySchedules.filter((schedule: Schedule) => {
+      const isYearMatch = Number(schedule.scheduleYear) === year;
+      const isMonthMatch = Number(schedule.scheduleMonth) === month;
+      const isDateMatch = Number(schedule.scheduleDate) === date;
+
+      return isYearMatch && isMonthMatch && isDateMatch;
+    });
+  }, [mySchedules, year, month, date]);
 
   const onRefresh = async () => {
     setRefreshing(true);
