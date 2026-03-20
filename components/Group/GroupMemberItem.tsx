@@ -1,8 +1,9 @@
 import { colors } from '@/constants';
 import { User } from '@/types';
 import { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Popover from 'react-native-popover-view';
+import { ProfileImage } from '../ProfileImage';
 
 type Props = {
   runner: User;
@@ -36,12 +37,9 @@ export default function GroupMemberItem({
             }}
             style={styles.memberInfo}
           >
-            <Image
-              source={
-                runner?.runnerImageLink
-                  ? { uri: runner.runnerImageLink }
-                  : defaultImage
-              }
+            <ProfileImage
+              uri={runner.runnerImageLink}
+              size={80}
               style={styles.memberImage}
             />
             <Text style={styles.memberName}>{runner.runnerName}</Text>

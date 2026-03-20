@@ -28,7 +28,6 @@ export default function GroupList() {
       token: group.token,
     }));
   }, [joinedGroups, selfGroup]);
-  console.log('selfGroup :', selfGroup);
 
   return (
     <FlatList
