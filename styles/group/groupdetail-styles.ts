@@ -37,10 +37,11 @@ export const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 60,
-    backgroundColor: colors.GRAY,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   userSelcetd: {
     borderWidth: 2,
