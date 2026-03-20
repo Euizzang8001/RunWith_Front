@@ -1,56 +1,45 @@
 import { ProfileImage } from '@/components/ProfileImage';
+import { useGetActions } from '@/hooks/queries/actions/use-get-action';
 import { useGetGroupInRunner } from '@/hooks/queries/group/use-get-group-in-runner.data';
 import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
 import { useGetSchedule } from '@/hooks/queries/schedule/use-get-schedule';
 import { useUserSession } from '@/store/useAuthStore';
-import {
-  useLatestScheduleId,
-  useScheduleStore,
-} from '@/store/useScheduleStore';
-import { GroupInfo, Schedule, User } from '@/types';
+import { Actions, GroupInfo, Schedule, User } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '../../../styles/group/groupdetail-styles';
 
 export default function GroupDetail() {
   const user = useUserSession();
-  const { schedules } = useScheduleStore();
-  const latestScheduleId = useLatestScheduleId();
-
-  const { groupId } = useLocalSearchParams<{
-    groupId: string;
-  }>();
-  const { data: groupInRunner } = useGetGroupInRunner(
-    groupId,
-    user?.token || '',
-  );
-  const today = new Date();
-
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const date = today.getDate();
-
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(
     null,
   );
+  const { groupId } = useLocalSearchParams<{
+    groupId: string;
+  }>();
+
+  const { data: getActions = [] } = useGetActions(
+    user?.token || '',
+    selectedSchedule?.scheduleId || '',
+  );
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const date = today.getDate();
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+
+  const [scheduleAction, setScheduleAction] = useState<Actions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: groups } = useGetMineGroups(user?.token || '');
-  const { data: getGroupInRunner } = useGetGroupInRunner(
+  const { data: getGroupInRunner = [] } = useGetGroupInRunner(
     groupId,
     user?.token || '',
   );
-
-  useEffect(() => {
-    if (latestScheduleId) {
-      console.log('방금 CalendarView에서 넘어온 ID:', latestScheduleId);
-    }
-  }, [latestScheduleId]);
 
   const group = groups?.find(
     (item: GroupInfo) => String(item.groupId) === groupId,
@@ -95,20 +84,34 @@ export default function GroupDetail() {
       },
     });
   };
-  // 임시 필터링
-  const { data: fetchedSchedules = [] } = useGetSchedule(user?.token || '');
 
+  // 선택한 멤버의 스케줄 불러오기
+  const selectedMember = useMemo(() => {
+    return getGroupInRunner?.find(
+      (runner: User) => runner.runnerId === selectedUser,
+    );
+  }, [selectedUser, getGroupInRunner]);
+
+  const { data: getSchedule = [] } = useGetSchedule(
+    user?.token,
+    selectedMember?.belongId,
+  );
+
+  // 선택한 유저의 스케줄(그룹별)
   const selectedUserSchedules = useMemo(() => {
-    if (!selectedUser) return [];
+    if (!selectedUser || !getSchedule || !selectedMember) return [];
 
-    return fetchedSchedules.filter((schedule: any) => {
+    return getSchedule.filter((schedule: Schedule) => {
       const isYearMatch = Number(schedule.scheduleYear) === year;
       const isMonthMatch = Number(schedule.scheduleMonth) === month;
       const isDateMatch = Number(schedule.scheduleDate) === date;
 
-      return isYearMatch && isMonthMatch && isDateMatch;
+      const isGroupSchedule =
+        String(schedule.belongId) === String(selectedMember.belongId);
+
+      return isYearMatch && isMonthMatch && isDateMatch && isGroupSchedule;
     });
-  }, [selectedUser, fetchedSchedules, year, month, date]);
+  }, [selectedUser, getSchedule, selectedMember, year, month, date]);
 
   if (!group)
     return (
@@ -116,7 +119,6 @@ export default function GroupDetail() {
         <Text>그룹 데이터가 없습니다.</Text>
       </SafeAreaView>
     );
-
   const selectedUserName = getGroupInRunner?.find(
     (runner: User) => runner.runnerId === selectedUser,
   );
@@ -143,16 +145,15 @@ export default function GroupDetail() {
       </View>
 
       <View style={styles.user_icon_Wrapper}>
-        {getGroupInRunner?.map((runner: User) => {
+        {getGroupInRunner.map((runner: User) => {
           const isSelected = selectedUser === runner.runnerId;
-
           return (
             <Pressable
-              key={runner.runnerId}
+              key={`runner-${runner.runnerId}`}
               onPress={() => setSelectedUser(runner.runnerId)}
               style={[styles.user_icon, isSelected && styles.userSelcetd]}
             >
-              <ProfileImage uri={user?.runnerImageLink} size={50} />
+              <ProfileImage uri={runner.runnerImageLink} size={50} />
             </Pressable>
           );
         })}
@@ -202,22 +203,40 @@ export default function GroupDetail() {
           onRequestClose={() => setIsModalOpen(false)}
         >
           <View>
-            <View>
-              {selectedSchedule && (
-                <View>
-                  <Text>{selectedSchedule.scheduleDescription}</Text>
+            {selectedSchedule && (
+              <View>
+                {/* 스케줄 제목 */}
+                <Text>{selectedSchedule.scheduleDescription}</Text>
 
-                  <Pressable
-                    onPress={() => {
-                      setIsModalOpen(false);
-                      setSelectedSchedule(null);
-                    }}
-                  >
-                    <Text>X</Text>
-                  </Pressable>
-                </View>
-              )}
-            </View>
+                <Text>할 일</Text>
+
+                {/* 액션 목록 출력 */}
+                {getActions.length > 0 ? (
+                  getActions.map((action: Actions) => (
+                    <View key={action.actionId}>
+                      <Text>{action.actionName}</Text>
+                      <Text>
+                        {action.actionStartHour}:
+                        {String(action.actionStartMinute).padStart(2, '0')} ~
+                        {action.actionEndHour}:
+                        {String(action.actionEndMinute).padStart(2, '0')}
+                      </Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text>등록된 액션이 없습니다.</Text>
+                )}
+
+                <Pressable
+                  onPress={() => {
+                    setIsModalOpen(false);
+                    setSelectedSchedule(null);
+                  }}
+                >
+                  <Text>닫기</Text>
+                </Pressable>
+              </View>
+            )}
           </View>
         </Modal>
       </View>
