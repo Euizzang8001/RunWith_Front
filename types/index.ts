@@ -42,7 +42,6 @@ interface Actions {
   actionId: string;
   scheduleId: string;
   actionName: string;
-  actionDescription: string;
   actionStartHour: number;
   actionStartMinute: number;
   actionEndHour: number;
