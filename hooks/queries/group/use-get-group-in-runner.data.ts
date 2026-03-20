@@ -7,5 +7,8 @@ export function useGetGroupInRunner(groupId: string, token: string) {
     queryKey: QUERY_KEYS.group.runnersList(groupId),
     queryFn: () => getRunnerInGroups(groupId, token),
     enabled: !!groupId && !!token,
+
+    staleTime: 60 * 60 * 1000,
+    gcTime: 120 * 60 * 1000,
   });
 }
