@@ -76,14 +76,8 @@ export default function GroupOptions() {
       Alert.alert('그룹이 삭제되었습니다.');
       router.replace('/(tabs)/group');
     },
-    onError: (error: any) => {
-      const status = error.status;
-
+    onError: (error) => {
       Alert.alert('그룹 삭제를 실패했습니다.');
-
-      if (status === 401) {
-        Alert.alert('그룹에 멤버가 남아있어 삭제할 수 없습니다.');
-      }
     },
   });
 
