@@ -1,6 +1,12 @@
 import { User } from '@/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-import { combine, devtools } from 'zustand/middleware';
+import {
+  combine,
+  createJSONStorage,
+  devtools,
+  persist,
+} from 'zustand/middleware';
 
 type State = {
   user: User | null;
@@ -14,12 +20,23 @@ const initialState = {
 
 export const useAuthStore = create(
   devtools(
-    combine(initialState, (set) => ({
-      actions: {
-        setLogin: (user: User) => set({ user, isLoaded: true }),
-        setLogOut: () => set({ user: null, isLoaded: true }),
+    persist(
+      combine(initialState, (set) => ({
+        actions: {
+          setLogin: (user: User) => set({ user, isLoaded: true }),
+          setLogOut: () => set({ user: null, isLoaded: true }),
+        },
+      })),
+      {
+        name: 'authStore',
+        storage: createJSONStorage(() => AsyncStorage),
+
+        partialize: (state) => ({
+          user: state.user,
+          isLoaded: state.isLoaded,
+        }),
       },
-    })),
+    ),
     { name: 'authStore' },
   ),
 );
