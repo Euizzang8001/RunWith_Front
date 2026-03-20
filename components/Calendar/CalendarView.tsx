@@ -4,7 +4,7 @@ import { useDeleteActions } from '@/hooks/mutations/actions/use-delete-actions';
 import UseCreateSchedule from '@/hooks/mutations/schedules/use-create-schedules';
 import { useDeleteSchedule } from '@/hooks/mutations/schedules/use-delete-schedules';
 import { useGetActions } from '@/hooks/queries/actions/use-get-action';
-import { useGetSchedule } from '@/hooks/queries/schedule/use-get-schedule';
+import { useGetMySchedule } from '@/hooks/queries/schedule/use-get-my-schedule';
 import '@/lib/calendarLocale';
 import { useUserSession } from '@/store/useAuthStore';
 import { useActionsSchedules } from '@/store/useScheduleStore';
@@ -26,14 +26,13 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
   const user = useUserSession();
   const { setLatestScheduleId } = useActionsSchedules();
 
-  const { data: getSchedules = [] } = useGetSchedule(user?.token);
+  const { data: getMySchedules = [] } = useGetMySchedule(user?.token);
   const [targetScheduleId, setTargetScheduleId] = useState('');
 
   const { data: getActions = [] } = useGetActions(
     user?.token || '',
     targetScheduleId,
   );
-
   // 뮤테이션
   const { mutate: createSchedule, isPending: isCreateShedulePending } =
     UseCreateSchedule({
@@ -60,7 +59,6 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
     },
     onError: (error) => Alert.alert('액션 삭제 오류', error.message),
   });
-
   const { mutate: createActions } = UseCreateActions({
     onSuccess: () => {
       setActionNameInput('');
@@ -91,24 +89,24 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
 
   // 내 일정 필터링
   const filteredSchedules = useMemo(() => {
-    if (!getSchedules || getSchedules.length === 0 || !selected) return [];
+    if (!getMySchedules || getMySchedules.length === 0 || !selected) return [];
 
-    return getSchedules.filter((item: Schedule) => {
+    return getMySchedules.filter((item: Schedule) => {
       const itemDate = `${item.scheduleYear}-${String(
         item.scheduleMonth,
       ).padStart(2, '0')}-${String(item.scheduleDate).padStart(2, '0')}`;
 
       return itemDate === selected;
     });
-  }, [selected, getSchedules]);
+  }, [selected, getMySchedules]);
 
   // 일정 닷 표시
 
   const markedDates = useMemo(() => {
     const marks: MarkedDates = {};
 
-    if (getSchedules) {
-      getSchedules.forEach((item: Schedule) => {
+    if (getMySchedules) {
+      getMySchedules.forEach((item: Schedule) => {
         const date = `${item.scheduleYear}-${String(
           item.scheduleMonth,
         ).padStart(2, '0')}-${String(item.scheduleDate).padStart(2, '0')}`;
@@ -130,7 +128,7 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
     }
 
     return marks;
-  }, [selected, getSchedules]);
+  }, [selected, getMySchedules]);
 
   // 시간 포맷
 
@@ -301,8 +299,6 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
               <View style={styles.schedule_card}>
                 <View style={styles.card_info}>
                   <Text>{item.actionName}</Text>
-
-                  <Text>{item.actionDescription}</Text>
 
                   <Text>
                     {item.actionStartHour}시 {item.actionStartMinute}분 ~{' '}
