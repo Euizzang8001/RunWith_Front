@@ -1,7 +1,9 @@
 // 스케줄 조회
-export async function getSchedules(token: string) {
+export async function getSchedules(token: string, belongId?: string) {
+  const queryString = belongId ? `belongId=${belongId}` : '';
+
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules`,
+    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules?${queryString}`,
     {
       method: 'GET',
       headers: {
@@ -13,6 +15,25 @@ export async function getSchedules(token: string) {
 
   if (!response.ok) {
     throw new Error('스케줄 조회 오류');
+  }
+  return response.json();
+}
+
+// 내 스케줄 조회
+export async function getMySchedules(token: string) {
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules/me`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error('내 스케줄 조회 오류');
   }
   return response.json();
 }
