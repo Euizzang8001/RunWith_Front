@@ -43,10 +43,14 @@ export const QUERY_KEYS = {
   schedule: {
     all: ['schedule'],
     list: ['schedule', 'list'],
+    scheduleList: (belongId: string) => ['schedule', 'list', belongId],
   },
   actions: {
     all: ['actions'],
     list: ['actions', 'list'],
     actionsList: (scheduleId: string) => ['actions', 'list', scheduleId],
+  },
+  recognizes: {
+    all: ['recognizes'],
   },
 };
