@@ -1,6 +1,10 @@
 import { ProfileImage } from '@/components/ProfileImage';
 import { useGetMineRequestList } from '@/hooks/queries/join/use-get-mine-join-request.data';
-import { useAuthActions, useUserSession } from '@/store/useAuthStore';
+import {
+  useAuthActions,
+  useAuthStore,
+  useUserSession,
+} from '@/store/useAuthStore';
 import { styles } from '@/styles/my/my-styles';
 import { JoinRequest } from '@/types';
 import auth from '@react-native-firebase/auth';
@@ -26,6 +30,9 @@ export default function MyScreen() {
       },
     });
   };
+
+  const isLoaded = useAuthStore((s) => s.isLoaded);
+  if (!isLoaded) return null;
 
   const handleLogOut = () => {
     Alert.alert('로그아웃', '로그아웃 하시겠습니까?', [
@@ -67,34 +74,33 @@ export default function MyScreen() {
         </View>
         <View style={styles.textWrapper}>
           <Text style={{ fontFamily: 'pretendard400', fontSize: 16 }}>
-            {user?.runnerName}
+            {user?.token && user?.runnerName}
           </Text>
           <Pressable onPress={handleEditNickname}>
-            <Text>닉네임 설정</Text>
+            <Text>프로필 수정</Text>
           </Pressable>
         </View>
       </View>
       <View>
-        <Text>그룹 신청 현황</Text>
+        <Text style={styles.sectionTitle}>그룹 신청 현황</Text>
 
-        <View>
+        <View style={styles.requestListContainer}>
           {mineRequestGroup && mineRequestGroup.length > 0 ? (
-            mineRequestGroup.map((item: JoinRequest) => {
-              const group = item.groupId || item;
-
-              return (
-                <View key={item.groupId}>
-                  <View>
-                    <Text>{item.groupName}</Text>
-                  </View>
-                  <View>
-                    <Text>대기 중</Text>
-                  </View>
+            mineRequestGroup.map((item: JoinRequest) => (
+              <View key={item.groupId} style={styles.requestCard}>
+                <View style={styles.groupInfo}>
+                  <Text style={styles.groupNameText}>{item.groupName}</Text>
                 </View>
-              );
-            })
+
+                <View style={styles.statusBadge}>
+                  <Text style={styles.statusText}>대기 중</Text>
+                </View>
+              </View>
+            ))
           ) : (
-            <Text>신청한 그룹이 없습니다.</Text>
+            <View style={styles.requestCard}>
+              <Text style={styles.emptyText}>신청한 그룹이 없습니다.</Text>
+            </View>
           )}
         </View>
       </View>
