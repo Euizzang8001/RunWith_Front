@@ -34,35 +34,44 @@ export default function GroupItem({ group }: GroupListProps) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  item: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: colors.WHITE_BACKGROUND,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.BLUE,
+
+    shadowColor: colors.BLUE,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+
+    elevation: 3,
+  },
+  info: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
   },
   title: {
     fontSize: 16,
     fontFamily: 'pretendard300',
+    color: '#1A1A1A',
+    flex: 1,
   },
   headCount: {
     color: colors.GRAY_FONT,
   },
-  item: {
-    gap: 10,
-    borderRadius: 24,
-    backgroundColor: colors.WHITE_BACKGROUND,
-    borderColor: colors.BLUE,
-    borderWidth: 1,
-    maxWidth: 400,
-    maxHeight: 500,
-  },
-  info: {
-    gap: 10,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   groupImage: {
     width: 50,
     height: 50,
-    borderRadius: 24,
+    borderRadius: 25,
     resizeMode: 'cover',
   },
 });

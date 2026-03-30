@@ -22,6 +22,7 @@ export default function GroupList() {
 
     return allGroups.map((group: GroupInfo) => ({
       groupId: group.groupId,
+      belongId: group.belongId,
       groupName: group.groupName,
       groupDescription: group.groupDescription,
       groupImageLink: group.groupImageLink,

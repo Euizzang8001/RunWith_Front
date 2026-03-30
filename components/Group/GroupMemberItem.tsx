@@ -1,5 +1,6 @@
 import { colors } from '@/constants';
 import { User } from '@/types';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Popover from 'react-native-popover-view';
@@ -19,7 +20,6 @@ export default function GroupMemberItem({
   onChangeLeader,
 }: Props) {
   const [visible, setVisible] = useState(false);
-  const defaultImage = require('@/assets/images/default-avatar.jpg');
 
   return (
     <Popover
@@ -43,6 +43,13 @@ export default function GroupMemberItem({
               style={styles.memberImage}
             />
             <Text style={styles.memberName}>{runner.runnerName}</Text>
+            {runner.leader && (
+              <MaterialCommunityIcons
+                name="crown"
+                size={24}
+                color={colors.GOLD}
+              />
+            )}
           </Pressable>
         </View>
       )}
