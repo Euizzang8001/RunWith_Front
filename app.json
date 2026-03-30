@@ -11,6 +11,11 @@
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.dev.RunWith",
+      "scheme": [
+        "runwith",
+        "com.dev.RunWith",
+        "com.googleusercontent.apps.221570016133-b272m52e7sm8eua5j490leneliteg6h6"
+      ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
@@ -19,6 +24,7 @@
       }
     },
     "android": {
+      "launchMode": "singleTask",
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -39,7 +45,6 @@
       "expo-router",
       [
         "expo-splash-screen",
-
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
@@ -52,7 +57,16 @@
       ],
       "@react-native-community/datetimepicker",
       "@react-native-google-signin/google-signin",
-      "@react-native-firebase/app",
+
+      [
+        "@react-native-firebase/app",
+        {
+          "ios": {
+            "bundleIdentifier": "com.dev.RunWith"
+          }
+        }
+      ],
+
       "@react-native-firebase/auth",
       [
         "expo-build-properties",
@@ -62,7 +76,8 @@
             "forceStaticLinking": ["RNFBApp", "RNFBAuth"]
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,

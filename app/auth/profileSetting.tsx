@@ -1,7 +1,7 @@
 import CustomButton from '@/components/CustomButton';
-import ImageViewer from '@/components/Image/ImageViewer';
 import InputField from '@/components/InputField';
 import Loader from '@/components/Loader';
+import { ProfileImage } from '@/components/ProfileImage';
 import { useSignUp } from '@/hooks/mutations/auth/use-sign-up';
 import { useUpdateRunnersInfo } from '@/hooks/mutations/runners/use-update-runners-info';
 import { useAuthActions, useUserSession } from '@/store/useAuthStore';
@@ -48,14 +48,13 @@ export default function NicknameSetting() {
     }
   };
 
-  const defaultImage = require('@/assets/images/default-avatar.jpg');
-  const profileImage = selectedImage?.uri || params.prevRunnerImageLink;
-
   // 회원가입
   const { mutate: signUp, isPending } = useSignUp({
     onSuccess: (data) => {
-      console.log('직접 확인 성공:', data);
-      setLogin(data);
+      setLogin({
+        token: user?.token,
+        ...data,
+      });
       Alert.alert('닉네임 설정 성공');
       router.replace('/(tabs)');
     },
@@ -93,10 +92,15 @@ export default function NicknameSetting() {
       console.log('보내는 토큰:', token);
       console.log(typeof token);
       if (isEditMode) {
+        const runnerProfileImage = selectedImage
+          ? selectedImage
+          : params.prevRunnerImageLink
+            ? { uri: params.prevRunnerImageLink }
+            : undefined;
         updateRunner(
           {
             runnerName,
-            runnerImageLink: selectedImage,
+            runnerImageLink: runnerProfileImage,
             token,
           },
           {
@@ -140,9 +144,9 @@ export default function NicknameSetting() {
       >
         <Pressable onPress={pickImageAsync} style={styles.image_wrapper}>
           <View>
-            <ImageViewer
-              defaultImage={defaultImage}
-              selectedImage={profileImage}
+            <ProfileImage
+              uri={selectedImage?.uri || params.prevRunnerImageLink}
+              size={80}
             />
           </View>
         </Pressable>

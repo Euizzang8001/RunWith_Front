@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "221570016133-4sl93827n5tt8dceifocinc0flv63dmu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dev.RunWith",
+            "certificate_hash": "4fe16b88fda2667301883a0124c36cdf83df17fa"
+          }
+        },
+        {
           "client_id": "221570016133-cbk1ddjh319j9b9j319k500iajp3uinj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
