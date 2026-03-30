@@ -10,7 +10,7 @@ interface User {
 }
 
 interface GroupInfo {
-  belongId?: string;
+  belongId: string;
   groupId: string;
   groupDescription: string;
   groupImageLink: string;
@@ -35,6 +35,8 @@ interface Schedule {
   scheduleYear: number;
   scheduleMonth: number;
   scheduleDate: number;
+  recognizeCount: number;
+  recognizedByMe: boolean;
 }
 
 interface Actions {
@@ -42,10 +44,18 @@ interface Actions {
   actionId: string;
   scheduleId: string;
   actionName: string;
+  actionDescription: string;
   actionStartHour: number;
   actionStartMinute: number;
   actionEndHour: number;
   actionEndMinute: number;
+  actionImageLinks?: string[];
+  actionImageLinkList?: string[];
+}
+
+interface Recognize {
+  token: string;
+  scheduleId: string;
 }
 
 type UseMutaionCallback = {
@@ -59,6 +69,7 @@ export type {
   Actions,
   GroupInfo,
   JoinRequest,
+  Recognize,
   Schedule,
   UseMutaionCallback,
   User,
