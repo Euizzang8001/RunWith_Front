@@ -86,4 +86,84 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: colors.RED,
   },
+  modalOverlay: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  modalTitle: {
+    fontFamily: 'pretendard700',
+    fontSize: 20,
+    color: '#1A1A1A',
+  },
+  closeButton: {
+    padding: 4,
+  },
+  requestScroll: {
+    padding: 16,
+  },
+  requestCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 15,
+    marginBottom: 12,
+    // 그림자 설정
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  requestRunnerName: {
+    fontFamily: 'pretendard600',
+    fontSize: 16,
+    color: '#333',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  acceptBtn: {
+    backgroundColor: '#3498db', // 연한 초록 배경
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  acceptBtnText: {
+    fontFamily: 'pretendard700',
+    fontSize: 14,
+    color: '#ffffff', // 진한 초록 글씨
+  },
+  rejectBtn: {
+    backgroundColor: '#FFEBEE', // 연한 빨강 배경
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  rejectBtnText: {
+    fontFamily: 'pretendard700',
+    fontSize: 14,
+    color: '#C62828', // 진한 빨강 글씨
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 60,
+  },
+  emptyText: {
+    fontFamily: 'pretendard400',
+    fontSize: 15,
+    color: '#999',
+  },
 });

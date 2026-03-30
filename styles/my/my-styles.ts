@@ -56,4 +56,57 @@ export const styles = StyleSheet.create({
     textAlign: 'left',
     color: colors.RED,
   },
+  sectionTitle: {
+    fontFamily: 'pretendard700', // 굵은 폰트 추천
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 12,
+    marginTop: 24,
+    paddingHorizontal: 16,
+  },
+  requestListContainer: {
+    paddingHorizontal: 16,
+  },
+  requestCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 10,
+
+    elevation: 2,
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  groupInfo: {
+    flex: 1,
+  },
+  groupNameText: {
+    fontFamily: 'pretendard600',
+    fontSize: 16,
+    color: '#1A1A1A',
+    marginBottom: 4,
+  },
+  statusBadge: {
+    backgroundColor: '#F0F0F0',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+  },
+  statusText: {
+    fontFamily: 'pretendard500',
+    fontSize: 12,
+    color: '#666',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#999',
+    paddingVertical: 8,
+    fontFamily: 'pretendard400',
+  },
 });
