@@ -1,4 +1,3 @@
-import InputField from '@/components/InputField';
 import { colors } from '@/constants';
 import { useJoinRequest } from '@/hooks/mutations/join/use-join-request';
 import { useGetGroups } from '@/hooks/queries/group/use-get-group.data';
@@ -8,7 +7,15 @@ import { GroupInfo } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, FlatList, Keyboard, Pressable, Text, View } from 'react-native';
+import {
+  Alert,
+  FlatList,
+  Keyboard,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function JoinGroup() {
@@ -41,11 +48,14 @@ export default function JoinGroup() {
     setSearchKeyword(groupName.trim());
   };
 
-  const searchGroups = searchGroup || [];
+  const searchGroups = searchKeyword.length > 0 ? searchGroup || [] : [];
 
   const renderGroupList = ({ item }: { item: GroupInfo }) => (
-    <Pressable onPress={() => handleSelectGroup(item)}>
-      <Text>{item.groupName}</Text>
+    <Pressable style={styles.groupCard} onPress={() => handleSelectGroup(item)}>
+      <Text style={styles.groupName}>{item.groupName}</Text>
+      <View>
+        <Text style={styles.joinText}>신청하기</Text>
+      </View>
     </Pressable>
   );
 
@@ -67,41 +77,50 @@ export default function JoinGroup() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* 헤더 */}
       <View style={styles.container_top}>
         <Pressable style={styles.arrow_icon} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={32} color="black" />
+          <Feather name="arrow-left" size={28} color="black" />
         </Pressable>
-
         <Text style={styles.header}>그룹 찾기</Text>
         <View style={styles.right} />
       </View>
 
-      <View style={styles.inputWrapper}>
-        <InputField
-          value={groupName}
-          onChangeText={setGroupName}
-          onSubmitEditing={handleSearch}
-          label="그룹 명"
-          placeholder="찾고 싶은 그룹명을 입력해 주세요."
-        />
-        <Pressable onPress={handleSearch}>
-          <Feather name="search" size={24} color={colors.BLACK} />
+      <View style={styles.searchSection}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            value={groupName}
+            onChangeText={setGroupName}
+            onSubmitEditing={handleSearch}
+            placeholder="찾고 싶은 그룹명을 입력해 주세요."
+          />
+        </View>
+        <Pressable onPress={handleSearch} style={styles.searchIcon}>
+          <Feather name="search" size={22} color={colors.BLACK} />
         </Pressable>
       </View>
 
-      <View>
+      {/* 검색 결과 영역 */}
+      <View style={styles.listContainer}>
         {isSearchGroupFetching && searchKeyword.length > 0 ? (
-          <Text>검색 중...</Text>
+          <View style={styles.statusContainer}>
+            <Text style={styles.statusText}>검색 중...</Text>
+          </View>
         ) : searchGroups && searchGroups.length > 0 ? (
           <FlatList
             data={searchGroups}
             keyExtractor={(item) => item.groupId}
             renderItem={renderGroupList}
+            showsVerticalScrollIndicator={false}
           />
-        ) : groupName.length > 0 ? (
-          <Text>검색 결과가 없습니다.</Text>
         ) : (
-          <Text>참여할 그룹의 이름을 입력하세요.</Text>
+          <View style={styles.statusContainer}>
+            <Text style={styles.statusText}>
+              {searchKeyword.length > 0
+                ? '검색 결과가 없습니다.'
+                : '참여할 그룹의 이름을 입력하세요.'}
+            </Text>
+          </View>
         )}
       </View>
     </SafeAreaView>

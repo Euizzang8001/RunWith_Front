@@ -8,29 +8,33 @@ import { useGetGroupInRunner } from '@/hooks/queries/group/use-get-group-in-runn
 import { useGetGroups } from '@/hooks/queries/group/use-get-group.data';
 import { useGetJoinRequestList } from '@/hooks/queries/join/use-get-join-request-list.data';
 import { useUserSession } from '@/store/useAuthStore';
-import { JoinRequest, User } from '@/types';
+import { GroupInfo, JoinRequest, User } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import auth from '@react-native-firebase/auth';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { GroupImage } from '@/components/GroupImage';
+import { useGetSelfGroup } from '@/hooks/queries/group/use-get-mine-group.data';
 import { styles } from '@/styles/group/groupOptions-styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function GroupOptions() {
-  const { groupId } = useLocalSearchParams<{ groupId: string }>();
   const user = useUserSession();
+
+  const { groupId } = useLocalSearchParams<{ groupId: string }>();
+
   const [groupName, setGroupName] = useState('');
 
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
+  const { data: Getgroups } = useGetGroups(user?.token || '', groupName);
   const { data: getGroupInRunner } = useGetGroupInRunner(
     groupId,
     user?.token || '',
   );
-  console.log(getGroupInRunner);
+  const { data: getSelfGroup } = useGetSelfGroup(user?.token || '');
 
   const me = getGroupInRunner?.find(
     (runner: User) => runner.runnerName === user?.runnerName,
@@ -66,8 +70,10 @@ export default function GroupOptions() {
       Alert.alert('그룹을 탈퇴했습니다.');
       router.replace('/(tabs)/group');
     },
-    onError: (error) => {
-      Alert.alert('그룹 탈퇴를 실패했습니다.');
+    onError: (error: any) => {
+      console.error('❌ 탈퇴 에러 발생:', error);
+      const errorMsg = error.response?.data?.message || error.message;
+      Alert.alert('그룹 탈퇴 실패', `사유: ${errorMsg}`);
     },
   });
 
@@ -89,6 +95,12 @@ export default function GroupOptions() {
       Alert.alert('리더 변경 실패');
     },
   });
+
+  const isSelfGroup = useMemo(() => {
+    if (!getSelfGroup) return false;
+
+    return String(getSelfGroup.groupId) === String(groupId);
+  }, [getSelfGroup, groupId]);
 
   const handleUpdateLeader = (runnerId: string, runnerName: string) => {
     Alert.alert('리더 변경', `${runnerName}님으로 리더를 변경하시겠습니까?`, [
@@ -194,12 +206,19 @@ export default function GroupOptions() {
     });
   };
 
-  const { data: groups } = useGetGroups(user?.token || '', groupName);
-
-  const groupItem = groups?.find(
-    (item: any) => String(item.groupId) === groupId,
+  const groupItem = Getgroups?.find(
+    (item: GroupInfo) => String(item.groupId) === groupId,
   );
-  const { data: runners } = useGetGroupInRunner(groupId, user?.token || '');
+
+  const sortedRunners = useMemo(() => {
+    if (!getGroupInRunner) return [];
+
+    return [...getGroupInRunner].sort((a, b) => {
+      if (a.leader && !b.leader) return -1;
+      if (!a.leader && b.leader) return 1;
+      return 0;
+    });
+  }, [getGroupInRunner]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -207,9 +226,12 @@ export default function GroupOptions() {
         <Pressable style={styles.arrow_icon} onPress={() => router.back()}>
           <Feather name="arrow-left" size={32} color="black" />
         </Pressable>
-        <Pressable onPress={handleGroupEdit}>
-          <Text style={{ textAlign: 'right' }}>그룹 수정</Text>
-        </Pressable>
+        {/* 리더만 그룹 수정 가능 */}
+        {isLeader && (
+          <Pressable onPress={handleGroupEdit}>
+            <Text style={{ textAlign: 'right' }}>그룹 수정</Text>
+          </Pressable>
+        )}
       </View>
       <View style={styles.groupInfo_container}>
         <View style={styles.iconWrapper}>
@@ -217,9 +239,11 @@ export default function GroupOptions() {
         </View>
         <View style={styles.textWrapper}>
           <Text style={styles.groupName}>{groupItem?.groupName}</Text>
-          <Text style={styles.groupDescription}>
-            {groupItem?.groupDescription}
-          </Text>
+          {!isSelfGroup && (
+            <Text style={styles.groupDescription}>
+              {groupItem?.groupDescription}
+            </Text>
+          )}
         </View>
       </View>
 
@@ -227,7 +251,7 @@ export default function GroupOptions() {
         <Text style={styles.memberText}>멤버</Text>
 
         <View>
-          {runners?.map((runner: User) => (
+          {sortedRunners?.map((runner: User) => (
             <GroupMemberItem
               key={runner.runnerId}
               runner={runner}
@@ -241,93 +265,84 @@ export default function GroupOptions() {
 
       <View style={styles.bottom}>
         <View style={styles.bottomButton}>
-          <Pressable onPress={() => setIsRequestModalOpen(true)}>
-            <Text style={styles.groupRequestListText}>그룹 신청 명단</Text>
-          </Pressable>
+          {isLeader && (
+            <Pressable onPress={() => setIsRequestModalOpen(true)}>
+              <Text style={styles.groupRequestListText}>그룹 신청 명단</Text>
+            </Pressable>
+          )}
           <Modal
             visible={isRequestModalOpen}
             animationType="slide"
             onRequestClose={() => setIsRequestModalOpen(false)}
           >
-            <SafeAreaView style={{ flex: 1 }}>
-              <View style={{ flex: 1, padding: 20 }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 20,
-                  }}
+            <SafeAreaView style={styles.modalOverlay}>
+              {/* 모달 헤더 */}
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>그룹 신청 명단</Text>
+                <Pressable
+                  style={styles.closeButton}
+                  onPress={() => setIsRequestModalOpen(false)}
                 >
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                    그룹 신청 명단
-                  </Text>
-                  <Pressable onPress={() => setIsRequestModalOpen(false)}>
-                    <Text style={{ fontSize: 18 }}>X</Text>
-                  </Pressable>
-                </View>
-
-                <ScrollView>
-                  {(requestList?.length ?? 0) > 0 ? (
-                    requestList.map((item: JoinRequest) => (
-                      <View
-                        key={item.joinRequestId}
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          paddingVertical: 12,
-                          borderBottomWidth: 1,
-                          borderColor: '#eee',
-                        }}
-                      >
-                        <Text>{item.runnerName}</Text>
-                        <View style={{ flexDirection: 'row', gap: 10 }}>
-                          <Pressable
-                            style={{
-                              backgroundColor: 'green',
-                              padding: 8,
-                              borderRadius: 6,
-                            }}
-                            onPress={() =>
-                              handleAcceptRequest(item.joinRequestId)
-                            }
-                          >
-                            <Text style={{ color: 'white' }}>승인</Text>
-                          </Pressable>
-                          <Pressable
-                            style={{
-                              backgroundColor: 'red',
-                              padding: 8,
-                              borderRadius: 6,
-                            }}
-                            onPress={() =>
-                              handleRejectRequest(item.joinRequestId)
-                            }
-                          >
-                            <Text style={{ color: 'white' }}>거절</Text>
-                          </Pressable>
-                        </View>
-                      </View>
-                    ))
-                  ) : (
-                    <View style={{ alignItems: 'center', marginTop: 40 }}>
-                      <Text style={{ color: 'gray' }}>
-                        그룹 신청자가 없습니다.
-                      </Text>
-                    </View>
-                  )}
-                </ScrollView>
+                  <Feather name="x" size={26} color="black" />
+                </Pressable>
               </View>
+
+              {/* 신청자 리스트 */}
+              <ScrollView
+                contentContainerStyle={styles.requestScroll}
+                showsVerticalScrollIndicator={false}
+              >
+                {(requestList?.length ?? 0) > 0 ? (
+                  requestList.map((item: JoinRequest) => (
+                    <View key={item.joinRequestId} style={styles.requestCard}>
+                      <Text style={styles.requestRunnerName}>
+                        {item.runnerName}
+                      </Text>
+
+                      <View style={styles.actionButtons}>
+                        <Pressable
+                          style={styles.acceptBtn}
+                          onPress={() =>
+                            handleAcceptRequest(item.joinRequestId)
+                          }
+                        >
+                          <Text style={styles.acceptBtnText}>승인</Text>
+                        </Pressable>
+
+                        <Pressable
+                          style={styles.rejectBtn}
+                          onPress={() =>
+                            handleRejectRequest(item.joinRequestId)
+                          }
+                        >
+                          <Text style={styles.rejectBtnText}>거절</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  ))
+                ) : (
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>
+                      현재 신청한 러너가 없습니다.
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
             </SafeAreaView>
           </Modal>
 
-          <Pressable onPress={() => handleQuitGroup(groupId)}>
-            <Text style={styles.groupDeleteText}>그룹 탈퇴하기</Text>
-          </Pressable>
-          <Pressable onPress={() => handleDeleteGroup(groupId)}>
-            <Text style={styles.groupDeleteText}>그룹 삭제하기</Text>
-          </Pressable>
+          {/* 셀프그룹에서만 탈퇴 ui 보기 */}
+          {!isLeader && (
+            <Pressable onPress={() => handleQuitGroup(groupId)}>
+              <Text style={styles.groupDeleteText}>그룹 탈퇴하기</Text>
+            </Pressable>
+          )}
+          {/* 리더만 그룹 삭제 ui 보기 */}
+          {isLeader && (
+            <Pressable onPress={() => handleDeleteGroup(groupId)}>
+              <Text style={styles.groupDeleteText}>그룹 삭제하기</Text>
+            </Pressable>
+          )}
         </View>
       </View>
     </SafeAreaView>

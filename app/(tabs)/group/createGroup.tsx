@@ -1,4 +1,4 @@
-import ImageViewer from '@/components/Image/ImageViewer';
+import { GroupImage } from '@/components/GroupImage';
 import InputField from '@/components/InputField';
 import Loader from '@/components/Loader';
 import { useCreateGroup } from '@/hooks/mutations/group/use-create-group';
@@ -24,9 +24,13 @@ export default function CreateGroup() {
   const [selectedImage, setSelectedImage] = useState<
     ImagePicker.ImagePickerAsset | undefined
   >(undefined);
+
+  const [isImagePicked, setIsImagePicked] = useState(false);
+
   const { data: groups } = useGetGroups(userSession?.token || '', '');
 
   const groupItem = groups?.find((item: GroupInfo) => item.groupId === groupId);
+
   const mode = groupId ? 'edit' : 'create';
 
   useEffect(() => {
@@ -36,6 +40,7 @@ export default function CreateGroup() {
 
       if (groupItem.groupImageLink) {
         setSelectedImage({ uri: groupItem.groupImageLink } as any);
+        setIsImagePicked(false);
       }
     }
   }, [groupItem, mode]);
@@ -49,10 +54,11 @@ export default function CreateGroup() {
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0]);
+      setIsImagePicked(true);
     }
   };
 
-  const defaultImage = require('@/assets/images/default-avatar.jpg');
+  const defaultImage = require('@/assets/images/default-group-image.png');
 
   const groupNickname = 'test12345';
 
@@ -104,7 +110,7 @@ export default function CreateGroup() {
         token: freshToken,
         groupCertificationCriteria: 3,
         groupDescription,
-        groupImageLink: selectedImage,
+        groupImageLink: isImagePicked ? selectedImage : undefined,
       });
     } else {
       createGroup(
@@ -114,7 +120,7 @@ export default function CreateGroup() {
           groupNickname,
           groupCertificationCriteria: 3,
           groupDescription,
-          groupImageLink: selectedImage,
+          groupImageLink: isImagePicked ? selectedImage : undefined,
         },
         {
           onSuccess: () => {
@@ -155,10 +161,7 @@ export default function CreateGroup() {
 
       <Pressable onPress={pickImageAsync} style={styles.image_wrapper}>
         <View>
-          <ImageViewer
-            defaultImage={defaultImage}
-            selectedImage={selectedImage?.uri}
-          />
+          <GroupImage uri={groupItem?.groupImageLink} size={80} />
         </View>
       </Pressable>
 
