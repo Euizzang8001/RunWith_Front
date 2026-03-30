@@ -1,3 +1,4 @@
+// @ts-ignore
 import { colors } from '@/constants';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -13,10 +14,9 @@ SplashScreen.preventAutoHideAsync();
 export const unstable_settings = {
   initialRouteName: 'index',
 };
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const queryClient = new QueryClient();
-
   const [fontLoaded, setFontLoaded] = useState(false);
   useEffect(() => {
     GoogleSignin.configure({
