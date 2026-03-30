@@ -23,26 +23,33 @@ export default function FeedItem({ schedule, onPress }: FeedItemProps) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 10,
-    justifyContent: 'center',
-  },
-
-  title: {
-    fontSize: 18,
-    fontFamily: 'pretendard500',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
   },
   item: {
-    borderRadius: 24,
+    borderRadius: 12,
     backgroundColor: colors.WHITE,
-    maxWidth: 400,
-    maxHeight: 500,
-    shadowColor: colors.BLACK,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
 
-    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
-  info: { gap: 10, padding: 20 },
+  info: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 16,
+    fontFamily: 'pretendard600',
+    color: '#333',
+    flexShrink: 1,
+  },
 });

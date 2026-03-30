@@ -3,17 +3,9 @@ import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data
 import { useGetMySchedule } from '@/hooks/queries/schedule/use-get-my-schedule';
 import { useUserSession } from '@/store/useAuthStore';
 import { useActionsSchedules } from '@/store/useScheduleStore';
-import { GroupInfo, Schedule } from '@/types';
+import { Schedule } from '@/types';
 import { useMemo, useState } from 'react';
-import {
-  Alert,
-  FlatList,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import FeedItem from './FeedItem';
 
 export default function FeedList() {
@@ -96,7 +88,7 @@ export default function FeedList() {
         }
       />
 
-      <Modal
+      {/* <Modal
         visible={isGroupModalOpen}
         transparent={true}
         animationType="slide"
@@ -123,23 +115,28 @@ export default function FeedList() {
             ))}
           </View>
         </Pressable>
-      </Modal>
+      </Modal> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   contentContainerStyle: {
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 30,
+
+    paddingHorizontal: 20,
     backgroundColor: colors.WHITE_BACKGROUND,
   },
   emptySchedule: {
-    paddingVertical: 24,
-    flex: 1,
+    marginTop: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   emptySchedule_Text: {
     textAlign: 'center',
     fontFamily: 'pretendard400',
     fontSize: 16,
+    color: colors.GRAY_FONT,
   },
 });
