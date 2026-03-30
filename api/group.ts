@@ -110,6 +110,7 @@ export async function updateGroup({
 }: {
   token: string;
   groupId: string;
+
   groupCertificationCriteria: number;
   groupDescription: string;
   groupImageLink?:
@@ -118,28 +119,25 @@ export async function updateGroup({
 }) {
   const formData = new FormData();
 
-  if (groupImageLink?.uri) {
-    formData.append('image', {
-      uri: groupImageLink.uri,
-      name: groupImageLink.fileName || 'group_image.jpg',
-      type: groupImageLink.mimeType || 'image/jpeg',
-    } as any);
-  }
-
-  const data = {
+  const Groupdata = {
     groupCertificationCriteria,
     groupDescription,
   };
 
   formData.append('request', {
     name: 'request',
-    string: JSON.stringify(data),
+    string: JSON.stringify(Groupdata),
     type: 'application/json',
   } as any);
 
-  console.log('--- FormData Check ---');
-
-  console.log('보내는 JSON 데이터:', JSON.stringify(data));
+  if (groupImageLink) {
+    formData.append('image', {
+      uri: groupImageLink.uri,
+      name: groupImageLink.fileName || 'group_image.png',
+      type: groupImageLink.mimeType || 'image/png',
+    } as any);
+  }
+  console.log('보내는 JSON 데이터:', JSON.stringify(Groupdata));
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups/${groupId}`,
     {
@@ -154,8 +152,7 @@ export async function updateGroup({
     throw new Error(`그룹 수정 오류 : ${response.status}`);
   }
 
-  const result = await response.json();
-  console.log(result);
+  return response.json();
 }
 
 // 내 그룹 보기

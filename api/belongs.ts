@@ -53,7 +53,6 @@ export async function quitGroup({
       },
     },
   );
-  console.error(`에러코드: ${response.status}`);
 
   if (!response.ok) {
     throw new Error('그룹 탈퇴 에러');
@@ -82,10 +81,11 @@ export async function updateLeader({
       body: JSON.stringify({ newLeaderRunnerId, groupId }),
     },
   );
-  console.error(response.status);
+
   if (!response.ok) {
     throw new Error('리더 변경 오류');
   }
+  return response.json();
 }
 
 // 특정 그룹에 속한 모든 러너 조회

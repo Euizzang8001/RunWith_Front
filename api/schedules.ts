@@ -72,6 +72,10 @@ export async function createSchedules({
     },
   );
 
+  if (response.status === 400) {
+    throw new Error('그룹에서만 스케줄을 등록할 수 있습니다.');
+  }
+
   if (!response.ok) {
     console.log('스케줄 생성 오류 코드', response.status);
     throw new Error('스케줄 생성');
