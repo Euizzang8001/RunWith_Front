@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export function useGetSchedule(token?: string, belongId?: string) {
   return useQuery({
-    queryKey: [...QUERY_KEYS.schedule.all, belongId],
+    queryKey: QUERY_KEYS.schedule.scheduleList(belongId || ''),
     queryFn: () => getSchedules(token!, belongId),
     enabled: !!token,
     retry: false,

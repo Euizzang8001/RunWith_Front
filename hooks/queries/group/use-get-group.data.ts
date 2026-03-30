@@ -7,5 +7,7 @@ export function useGetGroups(token: string, groupName: string) {
     queryKey: QUERY_KEYS.group.searchGroups(token, groupName),
     queryFn: () => getGroups(token, groupName),
     enabled: !!token || !!groupName,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
