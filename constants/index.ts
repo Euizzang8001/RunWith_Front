@@ -6,6 +6,7 @@ const colors = {
   BLACK: '#1E1E1E',
   BLUE: '#0075FF',
   RED: '#fd3c3c',
+  GOLD: '#f7d621',
 };
 
 export { colors };
