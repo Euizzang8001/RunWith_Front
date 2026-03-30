@@ -254,18 +254,22 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
             renderItem={({ item }) => (
               <View style={styles.schedule_card}>
                 <View style={styles.card_info}>
-                  <Text>{item.scheduleDescription}</Text>
+                  <View style={styles.schedule_text_wrapper}>
+                    <Text numberOfLines={1} ellipsizeMode="tail">
+                      {item.scheduleDescription}
+                    </Text>
+                  </View>
 
                   <Pressable
                     onPress={() => handleOpenActionList(item.scheduleId)}
                   >
-                    <Text style={{ color: colors.BLUE }}>액션 보기</Text>
+                    <Text style={{ color: colors.BLUE }}>상세보기</Text>
                   </Pressable>
 
                   <Pressable
                     onPress={() => handleOpenActionModal(item.scheduleId)}
                   >
-                    <Text style={{ color: colors.BLUE }}>액션 추가</Text>
+                    <Text style={{ color: colors.BLUE }}>내용 추가</Text>
                   </Pressable>
 
                   <Pressable
@@ -290,7 +294,7 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
         />
 
         <View style={styles.modalContent}>
-          <Text style={styles.schedule_date}>액션 목록</Text>
+          <Text style={styles.schedule_date}>할 일 목록</Text>
 
           <FlatList
             data={getActions}
@@ -325,7 +329,7 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
         >
           <View style={styles.modalContent}>
             <InputField
-              label="일정을 입력해 주세요."
+              label="스케줄을 입력해 주세요."
               value={DescriptionInput}
               onChangeText={setDescriptionInput}
             />
@@ -357,13 +361,13 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
         >
           <View style={styles.modalContent}>
             <InputField
-              label="액션 이름"
+              label="할 일"
               value={actionNameInput}
               onChangeText={setActionNameInput}
             />
 
             <InputField
-              label="액션 설명"
+              label="상세내용"
               value={actionDescriptionInput}
               onChangeText={setActionDescriptionInput}
             />
@@ -388,14 +392,30 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
 
             <View style={styles.actionContainer}>
               <Pressable onPress={handleSaveAction} style={styles.saveButton}>
-                <Text>저장</Text>
+                <Text
+                  style={{
+                    color: colors.WHITE,
+                    fontFamily: 'pretendard500',
+                    fontSize: 16,
+                  }}
+                >
+                  저장
+                </Text>
               </Pressable>
 
               <Pressable
                 onPress={() => setIsActionModalOpen(false)}
                 style={styles.cancelButton}
               >
-                <Text>취소</Text>
+                <Text
+                  style={{
+                    color: colors.BLACK,
+                    fontFamily: 'pretendard500',
+                    fontSize: 16,
+                  }}
+                >
+                  취소
+                </Text>
               </Pressable>
             </View>
           </View>
