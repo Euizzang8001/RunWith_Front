@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '100%',
     height: 57,
-    paddingHorizontal: 15,
+    paddingHorizontal: 0,
     borderRadius: 12,
   },
   filled: {
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   standard: {},
   input: {
     fontSize: 14,
-    padding: 0,
+    padding: 20,
     flex: 1,
   },
 });

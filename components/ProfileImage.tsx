@@ -24,6 +24,7 @@ export const ProfileImage = ({
 
   const getSource = (): ImageSourcePropType => {
     if (
+      typeof uri !== 'string' ||
       !uri ||
       uri === 'null' ||
       uri === 'undefined' ||

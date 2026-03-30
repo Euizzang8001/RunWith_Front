@@ -9,7 +9,15 @@ import { StyleSheet, View } from 'react-native';
 import { useGetExistRunner } from '@/hooks/queries/use-get-exist-runner.data';
 import { useGetRunnersInfo } from '@/hooks/queries/use-get-runners-info';
 import { useAuthActions } from '@/store/useAuthStore';
-import auth, { GoogleAuthProvider } from '@react-native-firebase/auth';
+
+// 🔥 [수정 1] 기존의 'auth' 기본 임포트 대신, 모듈러 전용 함수들을 불러옵니다.
+import {
+  signOut as firebaseSignOut,
+  getAuth,
+  getIdToken,
+  GoogleAuthProvider,
+  signInWithCredential,
+} from '@react-native-firebase/auth';
 
 export default function GoogleLogin() {
   const { setLogin } = useAuthActions();
@@ -24,6 +32,8 @@ export default function GoogleLogin() {
     GoogleSignin.configure({
       webClientId:
         '221570016133-barlvpo8bvu8utpkh2k97tseudhpdf3e.apps.googleusercontent.com',
+      iosClientId:
+        '221570016133-b272m52e7sm8eua5j490leneliteg6h6.apps.googleusercontent.com',
     });
   }, []);
 
@@ -44,17 +54,18 @@ export default function GoogleLogin() {
   const onGoogleButtonPress = async () => {
     try {
       await GoogleSignin.signOut().catch(() => {});
-      await auth()
-        .signOut()
-        .catch(() => {});
+
+      const auth = getAuth();
+
+      await firebaseSignOut(auth).catch(() => {});
 
       const { data } = await GoogleSignin.signIn();
       const googleCredential = GoogleAuthProvider.credential(data?.idToken);
-      const userCredential =
-        await auth().signInWithCredential(googleCredential);
+
+      const userCredential = await signInWithCredential(auth, googleCredential);
 
       if (userCredential.user) {
-        const token = await userCredential.user.getIdToken(true);
+        const token = await getIdToken(userCredential.user, true);
 
         setFirebaseToken(token);
       }
@@ -62,6 +73,7 @@ export default function GoogleLogin() {
       console.error(error);
     }
   };
+
   return (
     <View style={styles.googleLogin}>
       <GoogleSigninButton

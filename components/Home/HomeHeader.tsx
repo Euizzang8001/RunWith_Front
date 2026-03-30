@@ -1,7 +1,6 @@
 import TodayDate from '@/components/TodayDate';
 import { colors } from '@/constants';
 import Feather from '@expo/vector-icons/Feather';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -18,9 +17,6 @@ export default function HomeHeader() {
         <View style={styles.icon}>
           <Pressable onPress={goToCalendar}>
             <Feather name="calendar" size={24} color="black" />
-          </Pressable>
-          <Pressable>
-            <FontAwesome5 name="bell" size={24} color="black" />
           </Pressable>
         </View>
       </View>
