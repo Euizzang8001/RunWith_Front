@@ -1,14 +1,15 @@
-import { createActions } from '@/api/actions';
-import { QUERY_KEYS } from '@/lib/constants';
+import { updateActions } from '@/api/actions';
 import { UseMutaionCallback } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export default function useCreateActions(callbacks?: UseMutaionCallback) {
+export default function useUpdateActions(callbacks?: UseMutaionCallback) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createActions,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.actions.all });
+    mutationFn: updateActions,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ['actions'],
+      });
 
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },

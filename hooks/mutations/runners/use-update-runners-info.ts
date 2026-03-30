@@ -11,6 +11,8 @@ export function useUpdateRunnersInfo(callbacks?: UseMutaionCallback) {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.runnerInfo() });
 
+      queryClient.invalidateQueries({ queryKey: ['group'] });
+
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
     onError: (error) => {
