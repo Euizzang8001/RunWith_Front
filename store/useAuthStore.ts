@@ -25,12 +25,15 @@ export const useAuthStore = create(
         actions: {
           setLogin: (user: User) => set({ user, isLoaded: true }),
           setLogOut: () => set({ user: null, isLoaded: true }),
+          setHasHydrated: (state: boolean) => set({ isLoaded: state }),
         },
       })),
       {
         name: 'authStore',
         storage: createJSONStorage(() => AsyncStorage),
-
+        onRehydrateStorage: () => (state) => {
+          state?.actions.setHasHydrated(true);
+        },
         partialize: (state) => ({
           user: state.user,
           isLoaded: state.isLoaded,
