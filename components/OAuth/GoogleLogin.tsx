@@ -1,16 +1,12 @@
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-} from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text } from 'react-native';
 
 import { useGetExistRunner } from '@/hooks/queries/use-get-exist-runner.data';
 import { useGetRunnersInfo } from '@/hooks/queries/use-get-runners-info';
 import { useAuthActions } from '@/store/useAuthStore';
 
-// 🔥 [수정 1] 기존의 'auth' 기본 임포트 대신, 모듈러 전용 함수들을 불러옵니다.
 import {
   signOut as firebaseSignOut,
   getAuth,
@@ -25,7 +21,7 @@ export default function GoogleLogin() {
 
   const [firebaseToken, setFirebaseToken] = useState<string | undefined>();
 
-  const { data: runner, isError } = useGetExistRunner(firebaseToken);
+  const { data: runner } = useGetExistRunner(firebaseToken);
   const { data: runnerInfo } = useGetRunnersInfo(firebaseToken);
 
   useEffect(() => {
@@ -38,18 +34,18 @@ export default function GoogleLogin() {
   }, []);
 
   useEffect(() => {
-    if (runner && firebaseToken) {
-      if (runner.isExist) {
-        console.log('러너 정보:', JSON.stringify(runnerInfo, null, 2));
-        setLogin({ ...runnerInfo, token: firebaseToken });
-        router.replace('/(tabs)');
-      } else {
-        router.replace('/auth/profileSetting');
-      }
-    }
+    if (!firebaseToken || !runner) return;
 
-    if (!firebaseToken) return;
-  }, [runnerInfo, firebaseToken, runner]);
+    if (runner.isExist) {
+      if (!runnerInfo) return;
+
+      console.log('러너 정보:', JSON.stringify(runnerInfo, null, 2));
+      setLogin({ ...runnerInfo, token: firebaseToken });
+      router.replace('/(tabs)');
+    } else {
+      router.replace('/auth/profileSetting');
+    }
+  }, [runner, runnerInfo, firebaseToken]);
 
   const onGoogleButtonPress = async () => {
     try {
@@ -68,6 +64,8 @@ export default function GoogleLogin() {
         const token = await getIdToken(userCredential.user, true);
 
         setFirebaseToken(token);
+
+        console.log(token);
       }
     } catch (error) {
       console.error(error);
@@ -75,21 +73,65 @@ export default function GoogleLogin() {
   };
 
   return (
-    <View style={styles.googleLogin}>
-      <GoogleSigninButton
-        style={{ width: 320, height: 48 }}
-        size={GoogleSigninButton.Size.Wide}
-        color={GoogleSigninButton.Color.Dark}
-        onPress={onGoogleButtonPress}
+    <Pressable
+      style={[styles.customButton, styles.googleButton]}
+      onPress={onGoogleButtonPress}
+    >
+      <Image
+        source={{
+          uri: 'https://developers.google.com/identity/images/g-logo.png',
+        }}
+        style={styles.googleIcon}
       />
-    </View>
+      <Text style={styles.googleText}>Google 계정으로 로그인</Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  googleLogin: {
+  loginContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 12,
+  },
+  customButton: {
+    width: 320,
+    height: 50,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    elevation: 2,
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#f1f1f1',
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+  },
+  googleIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 10,
+  },
+  googleText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000000',
+    fontFamily: 'Pretendard-SemiBold',
+  },
+  appleText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    fontFamily: 'Pretendard-SemiBold',
   },
 });

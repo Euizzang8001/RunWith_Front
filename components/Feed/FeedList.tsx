@@ -1,11 +1,13 @@
+import { ActionModal } from '@/components/Actions/ActionModal'; // 👈 ActionModal 임포트
 import { colors } from '@/constants';
+import { useGetActions } from '@/hooks/queries/actions/use-get-action'; // 👈 액션 상세 데이터를 가져올 훅 임포트
 import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
 import { useGetMySchedule } from '@/hooks/queries/schedule/use-get-my-schedule';
 import { useUserSession } from '@/store/useAuthStore';
 import { useActionsSchedules } from '@/store/useScheduleStore';
 import { Schedule } from '@/types';
 import { useMemo, useState } from 'react';
-import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import FeedItem from './FeedItem';
 
 export default function FeedList() {
@@ -16,10 +18,15 @@ export default function FeedList() {
 
   const [refreshing, setRefreshing] = useState(false);
   const [selecetdFeed, setSelectedFeed] = useState<Schedule | null>(null);
-  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data: getActions = [] } = useGetActions(
+    user?.token || '',
+    selecetdFeed?.scheduleId || '',
+  );
 
   const today = new Date();
-
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const date = today.getDate();
@@ -38,7 +45,6 @@ export default function FeedList() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-
     setTimeout(() => {
       setRefreshing(false);
     }, 800);
@@ -46,25 +52,11 @@ export default function FeedList() {
 
   const handleOpenFeed = (feed: Schedule) => {
     setSelectedFeed(feed);
-    setIsGroupModalOpen(true);
-  };
-
-  const handleSendGroup = ({
-    groupId,
-    groupName,
-  }: {
-    groupId: string;
-    groupName: string;
-  }) => {
-    if (!selecetdFeed) return;
-
-    updateScheduleStore(selecetdFeed?.scheduleId, { groupId: groupId });
-    Alert.alert('연동 완료', `${groupName} 그룹에 일정이 연동 되었습니다.`);
-    setIsGroupModalOpen(false);
+    setIsModalOpen(true);
   };
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={todaySchedule}
         renderItem={({ item }) => (
@@ -88,34 +80,17 @@ export default function FeedList() {
         }
       />
 
-      {/* <Modal
-        visible={isGroupModalOpen}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setIsGroupModalOpen(false)}
-      >
-        <Pressable>
-          <View>
-            <Text>일정을 전달할 그룹을 선택하세요.</Text>
-            {groups?.map((item: GroupInfo) => (
-              <Pressable
-                key={item.groupId}
-                onPress={() =>
-                  handleSendGroup({
-                    groupId: item.groupId,
-                    groupName: item.groupName,
-                  })
-                }
-              >
-                <Text>{item.groupName}</Text>
-                <View>
-                  <Text>선택</Text>
-                </View>
-              </Pressable>
-            ))}
-          </View>
-        </Pressable>
-      </Modal> */}
+      <ActionModal
+        isVisible={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+        selectedSchedule={selecetdFeed}
+        getActions={getActions}
+        actionImages={{}}
+        onPickImage={() => {}}
+        clearActionImages={() => {}}
+      />
     </View>
   );
 }
@@ -124,7 +99,6 @@ const styles = StyleSheet.create({
   contentContainerStyle: {
     paddingTop: 10,
     paddingBottom: 30,
-
     paddingHorizontal: 20,
     backgroundColor: colors.WHITE_BACKGROUND,
   },

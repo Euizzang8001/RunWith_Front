@@ -16,9 +16,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-// ⭐️ 라이브러리 임포트
-import ImageView from 'react-native-image-viewing';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+// import ImageView from 'react-native-image-viewing';
 
 interface ActionListModalProps {
   isVisible: boolean;
@@ -39,6 +38,7 @@ export const ActionModal = ({
   onPickImage,
   clearActionImages,
 }: ActionListModalProps) => {
+  const insets = useSafeAreaInsets();
   const user = useUserSession();
 
   const { mutate: updateActions, isPending } = useUpdateActions({
@@ -63,7 +63,14 @@ export const ActionModal = ({
       animationType="slide"
       onRequestClose={handleClose}
     >
-      <SafeAreaView style={{ flex: 1, padding: 20 }}>
+      <View
+        style={{
+          flex: 1,
+          padding: 20,
+          paddingTop: insets.top + 20,
+          paddingBottom: insets.bottom,
+        }}
+      >
         {selectedSchedule && (
           <View style={{ flex: 1 }}>
             <Text style={styles.modal_title}>
@@ -89,7 +96,7 @@ export const ActionModal = ({
             </Pressable>
           </View>
         )}
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 };
@@ -251,15 +258,14 @@ const ActionItem = ({
         </ScrollView>
       </View>
 
-      {/* ⭐️ [추가] 이미지 확대 뷰어 모달 */}
-      <ImageView
+      {/* <ImageView
         images={allImagesForViewer}
         imageIndex={currentImageIndex}
         visible={isViewerOpen}
         onRequestClose={() => setIsViewerOpen(false)}
         swipeToCloseEnabled={true}
         doubleTapToZoomEnabled={true}
-      />
+      /> */}
     </View>
   );
 };

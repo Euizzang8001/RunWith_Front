@@ -25,6 +25,7 @@ export default function GroupMemberItem({
     <Popover
       isVisible={visible}
       onRequestClose={() => setVisible(false)}
+      backgroundStyle={{ backgroundColor: 'transparent' }}
       from={(sourceRef) => (
         <View ref={sourceRef as any} collapsable={false}>
           <Pressable

@@ -1,5 +1,5 @@
-import { useGetSelfGroup } from '@/hooks/queries/group/use-get-mine-group.data';
 import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
+import { useGetSelfGroup } from '@/hooks/queries/group/use-get-self-group.data';
 import { useUserSession } from '@/store/useAuthStore';
 import { GroupInfo } from '@/types';
 import { useMemo } from 'react';

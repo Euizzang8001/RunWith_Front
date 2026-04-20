@@ -14,6 +14,7 @@ export default function FeedItem({ schedule, onPress }: FeedItemProps) {
         <View style={styles.item}>
           <View style={styles.info}>
             <Text style={styles.title}>{schedule.scheduleDescription}</Text>
+            <Text style={styles.description}>자세히</Text>
           </View>
         </View>
       </View>
@@ -50,6 +51,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'pretendard600',
     color: '#333',
+    flexShrink: 1,
+  },
+  description: {
+    fontSize: 14,
+    fontFamily: 'pretendard600',
+    color: colors.BLUE,
     flexShrink: 1,
   },
 });
