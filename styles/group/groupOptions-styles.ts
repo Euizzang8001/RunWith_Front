@@ -88,26 +88,31 @@ export const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
+    backgroundColor: '#fff', // ⭐️ 불투명한 흰색 배경으로 풀스크린 처리
   },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
+    position: 'relative',
   },
   modalTitle: {
     fontFamily: 'pretendard700',
-    fontSize: 20,
+    fontSize: 18,
     color: '#1A1A1A',
   },
   closeButton: {
+    position: 'absolute',
+    right: 20,
     padding: 4,
   },
   requestScroll: {
     padding: 16,
+    flexGrow: 1,
   },
   requestCard: {
     flexDirection: 'row',

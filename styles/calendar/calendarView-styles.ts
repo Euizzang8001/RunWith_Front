@@ -51,10 +51,11 @@ export const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 30,
     paddingBottom: 40,
     minHeight: height * 0.5,
     maxHeight: height * 0.8,
+    gap: 30,
   },
 
   input_wrapper: {
