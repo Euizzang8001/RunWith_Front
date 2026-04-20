@@ -53,7 +53,7 @@ export async function quitGroup({
       },
     },
   );
-
+  console.log(response.status);
   if (!response.ok) {
     throw new Error('그룹 탈퇴 에러');
   }

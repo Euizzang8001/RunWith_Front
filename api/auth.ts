@@ -143,17 +143,13 @@ export async function updateRunnersInfo({
 }) {
   const formData = new FormData();
 
-  const signUpData = {
-    runnerName,
-  };
-
   formData.append('request', {
     name: 'request',
-    string: JSON.stringify(signUpData),
+    string: JSON.stringify({ runnerName }),
     type: 'application/json',
   } as any);
 
-  if (runnerImageLink) {
+  if (runnerImageLink?.uri) {
     formData.append('image', {
       uri: runnerImageLink.uri,
       name: runnerImageLink.fileName || 'profile.png',
