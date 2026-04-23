@@ -1,5 +1,4 @@
 // 러너 생성
-
 export async function signUp({
   token,
   runnerName,

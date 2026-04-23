@@ -1,3 +1,5 @@
+import { Alert } from 'react-native';
+
 // 그룹 생성
 export async function createGroup({
   groupName,
@@ -22,10 +24,11 @@ export async function createGroup({
     formData.append('image', {
       uri: groupImageLink.uri,
       name: groupImageLink.fileName || 'group_image.jpg',
-      type: groupImageLink.mimeType || 'image/jpe',
+      type: groupImageLink.mimeType || 'image/jpeg',
     } as any);
   }
-
+  console.log(groupImageLink);
+  console.log(formData);
   const data = {
     groupName,
     groupNickname,
@@ -91,6 +94,10 @@ export async function deleteGroup({
       },
     },
   );
+
+  if (response.status === 401) {
+    Alert.alert('스케줄이 남아있어 그룹 삭제가 불가능합니다.');
+  }
 
   if (!response.ok) {
     const error = new Error('그룹 삭제 실패');
