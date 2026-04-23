@@ -7,20 +7,38 @@
     "icon": "./assets/images/icon.png",
     "scheme": "runwith",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
+      "usesAppleSignIn": true,
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.dev.RunWith",
-      "scheme": [
-        "runwith",
-        "com.dev.RunWith",
-        "com.googleusercontent.apps.221570016133-b272m52e7sm8eua5j490leneliteg6h6"
-      ],
+      "scheme": "runwith",
       "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "스케줄 인증 사진을 선택하고 편집하기 위해 앨범 접근 권한이 필요합니다.",
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
-          "NSAllowArbitraryLoads": true
-        }
+          "NSAllowsArbitraryLoads": true,
+          "NSExceptionDomains": {
+            "13.125.26.132": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSIncludesSubdomains": true
+            }
+          }
+        },
+
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "Google Auth",
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.221570016133-b272m52e7sm8eua5j490leneliteg6h6"
+            ]
+          }
+        ]
       }
     },
     "android": {
@@ -43,6 +61,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-apple-authentication",
       [
         "expo-splash-screen",
         {

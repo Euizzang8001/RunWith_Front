@@ -11,16 +11,22 @@ import { useUserSession } from '@/store/useAuthStore';
 import { GroupInfo, JoinRequest, User } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import auth from '@react-native-firebase/auth';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 import { GroupImage } from '@/components/GroupImage';
-import { useGetSelfGroup } from '@/hooks/queries/group/use-get-mine-group.data';
+import { useGetSelfGroup } from '@/hooks/queries/group/use-get-self-group.data';
 import { styles } from '@/styles/group/groupOptions-styles';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 export default function GroupOptions() {
+  const insets = useSafeAreaInsets();
+
   const user = useUserSession();
 
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
@@ -29,7 +35,10 @@ export default function GroupOptions() {
 
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
-  const { data: Getgroups } = useGetGroups(user?.token || '', groupName);
+  const { data: getgroups, refetch: refetchGroups } = useGetGroups(
+    user?.token || '',
+    groupName,
+  );
   const { data: getGroupInRunner } = useGetGroupInRunner(
     groupId,
     user?.token || '',
@@ -47,52 +56,90 @@ export default function GroupOptions() {
     user?.token || '',
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      refetchGroups();
+    }, [refetchGroups]),
+  );
+
   const { mutate: acceptRequest } = useAccpetJoinRequest({
     onSuccess: () => {
-      Alert.alert('승인', '승인이 완료되었습니다.');
+      Toast.show({
+        type: 'success',
+        text1: '승인',
+        text2: '승인이 완료되었습니다.',
+      });
     },
     onError: () => {
-      Alert.alert('그룹 신청 승인 오류');
+      Toast.show({
+        type: 'error',
+        text1: '그룹 신청 승인 오류',
+      });
     },
   });
 
   const { mutate: rejectRequest } = useRejectJoinRequest({
     onSuccess: () => {
-      Alert.alert('거절', '신청을 거절했습니다.');
+      Toast.show({
+        type: 'success',
+        text1: '거절',
+        text2: '신청을 거절했습니다.',
+      });
     },
     onError: () => {
-      Alert.alert('그룹 신청 거절 오류');
+      Toast.show({
+        type: 'error',
+        text1: '그룹 신청 거절 오류',
+      });
     },
   });
 
   const { mutate: quitGroup } = useQuitGroup({
     onSuccess: () => {
-      Alert.alert('그룹을 탈퇴했습니다.');
+      Toast.show({
+        type: 'success',
+        text1: '그룹을 탈퇴했습니다.',
+      });
       router.replace('/(tabs)/group');
     },
     onError: (error: any) => {
-      console.error('❌ 탈퇴 에러 발생:', error);
       const errorMsg = error.response?.data?.message || error.message;
-      Alert.alert('그룹 탈퇴 실패', `사유: ${errorMsg}`);
+      Toast.show({
+        type: 'error',
+        text1: '그룹 탈퇴 실패',
+        text2: `사유: ${errorMsg}`,
+      });
     },
   });
 
   const { mutate: deleteGroup } = useDeleteGroup({
     onSuccess: () => {
-      Alert.alert('그룹이 삭제되었습니다.');
+      Toast.show({
+        type: 'success',
+        text1: '그룹이 삭제되었습니다.',
+      });
       router.replace('/(tabs)/group');
     },
     onError: (error) => {
-      Alert.alert('그룹 삭제를 실패했습니다.');
+      Toast.show({
+        type: 'error',
+        text1: '그룹 삭제를 실패했습니다.',
+      });
     },
   });
 
   const { mutate: updateLeader } = useUpdateLeader({
     onSuccess: () => {
-      Alert.alert('리더가 변경되었습니다.');
+      Toast.show({
+        type: 'success',
+        text1: '리더가 변경되었습니다.',
+      });
     },
     onError: () => {
-      Alert.alert('리더 변경 실패');
+      Toast.show({
+        type: 'error',
+        text1: '리더 변경 실패',
+      });
     },
   });
 
@@ -122,20 +169,45 @@ export default function GroupOptions() {
   };
 
   const handleQuitGroup = async (groupId: string) => {
-    Alert.alert('그룹 탈퇴', '정말 그룹을 탈퇴하겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '탈퇴',
-        style: 'destructive',
-        onPress: () => {
-          if (user?.token) {
-            quitGroup({ groupId, token: user.token });
-          } else {
-            Alert.alert('탈퇴 오류', '정보가 존재하지 않습니다.');
-          }
+    try {
+      const currentUser = auth().currentUser;
+
+      if (!currentUser) {
+        Toast.show({
+          type: 'error',
+          text1: '인증 오류',
+          text2: '로그인 정보가 존재하지 않습니다.',
+        });
+        return;
+      }
+
+      const freshToken = await currentUser.getIdToken(true);
+
+      if (!groupId || !freshToken) {
+        Toast.show({
+          type: 'error',
+          text1: '탈퇴 오류',
+          text2: '정보가 존재하지 않습니다.',
+        });
+        return;
+      }
+
+      Alert.alert('그룹 탈퇴', '정말 그룹을 탈퇴하겠습니까?', [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '탈퇴',
+          style: 'destructive',
+          onPress: () => quitGroup({ groupId, token: freshToken }),
         },
-      },
-    ]);
+      ]);
+    } catch (error) {
+      console.error('토큰 에러', error);
+      Toast.show({
+        type: 'error',
+        text1: '탈퇴 오류',
+        text2: '토큰을 갱신하는 데 실패했습니다.',
+      });
+    }
   };
 
   const handleDeleteGroup = async (groupId: string) => {
@@ -143,7 +215,11 @@ export default function GroupOptions() {
       const currentUser = auth().currentUser;
       const freshToken = await currentUser?.getIdToken(true);
       if (!groupId || !freshToken) {
-        Alert.alert('오류', '삭제할 ID가 없습니다.');
+        Toast.show({
+          type: 'error',
+          text1: '삭제 오류',
+          text2: '삭제할 ID가 없습니다.',
+        });
         return;
       }
       Alert.alert(
@@ -206,7 +282,7 @@ export default function GroupOptions() {
     });
   };
 
-  const groupItem = Getgroups?.find(
+  const groupItem = getgroups?.find(
     (item: GroupInfo) => String(item.groupId) === groupId,
   );
 
@@ -233,17 +309,25 @@ export default function GroupOptions() {
           </Pressable>
         )}
       </View>
+
       <View style={styles.groupInfo_container}>
         <View style={styles.iconWrapper}>
-          <GroupImage uri={groupItem?.groupImageLink} size={50} />
+          {!isSelfGroup ? (
+            <GroupImage uri={groupItem?.groupImageLink} size={50} />
+          ) : (
+            <GroupImage uri={user?.runnerImageLink} size={50} />
+          )}
         </View>
         <View style={styles.textWrapper}>
-          <Text style={styles.groupName}>{groupItem?.groupName}</Text>
           {!isSelfGroup && (
-            <Text style={styles.groupDescription}>
-              {groupItem?.groupDescription}
-            </Text>
+            <>
+              <Text style={styles.groupName}>{groupItem?.groupName}</Text>
+              <Text style={styles.groupDescription}>
+                {groupItem?.groupDescription}
+              </Text>
+            </>
           )}
+          {isSelfGroup && <Text style={styles.selfGroupName}>나만의 공간</Text>}
         </View>
       </View>
 
@@ -275,7 +359,12 @@ export default function GroupOptions() {
             animationType="slide"
             onRequestClose={() => setIsRequestModalOpen(false)}
           >
-            <SafeAreaView style={styles.modalOverlay}>
+            <View
+              style={[
+                styles.modalOverlay,
+                { paddingTop: insets.top, paddingBottom: insets.bottom },
+              ]}
+            >
               {/* 모달 헤더 */}
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>그룹 신청 명단</Text>
@@ -328,7 +417,7 @@ export default function GroupOptions() {
                   </View>
                 )}
               </ScrollView>
-            </SafeAreaView>
+            </View>
           </Modal>
 
           {/* 셀프그룹에서만 탈퇴 ui 보기 */}

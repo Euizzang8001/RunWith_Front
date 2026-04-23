@@ -3,13 +3,14 @@ import { ProfileImage } from '@/components/ProfileImage';
 import { usePostRecognizes } from '@/hooks/mutations/recognizes/use-post-recognizes';
 import { useGetActions } from '@/hooks/queries/actions/use-get-action';
 import { useGetGroupInRunner } from '@/hooks/queries/group/use-get-group-in-runner.data';
-import { useGetSelfGroup } from '@/hooks/queries/group/use-get-mine-group.data';
 import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
+import { useGetSelfGroup } from '@/hooks/queries/group/use-get-self-group.data';
 import { useGetSchedule } from '@/hooks/queries/schedule/use-get-schedule';
 import { useUserSession } from '@/store/useAuthStore';
 import { GroupInfo, Schedule, User } from '@/types';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -57,8 +58,6 @@ export default function GroupDetail() {
     },
   });
 
-  console.log(getActions);
-
   const group = useMemo(() => {
     const allGroups = [...groups];
 
@@ -73,40 +72,59 @@ export default function GroupDetail() {
 
   // 액션 이미지 추가
   const pickActionImage = async (actionId: string) => {
-    // 1. 현재 사진 개수 스냅샷 체크
-    const currentImagesSnapshot = actionImages[actionId] || [];
-    if (currentImagesSnapshot.length >= 5) {
-      Alert.alert('알림', '사진은 최대 5장까지 등록 가능합니다.');
-      return;
-    }
+    try {
+      const currentImagesSnapshot = actionImages[actionId] || [];
+      if (currentImagesSnapshot.length >= 5) {
+        Alert.alert('알림', '사진은 최대 5장까지 등록 가능합니다.');
+        return;
+      }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsMultipleSelection: true,
-      selectionLimit: 5,
-      quality: 0.3,
-    });
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('권한 필요', '설정에서 사진 접근 권한을 허용해주세요.');
+        return;
+      }
 
-    if (!result.canceled) {
-      const newlyPickedImages = result.assets.map((asset, index) => ({
-        ...asset,
-
-        uri: `${asset.uri}?t=${Date.now()}_${index}`,
-      }));
-
-      setActionImages((prev) => {
-        const prevImagesForAction = prev[actionId] || [];
-
-        const combined = [
-          ...prevImagesForAction.map((img) => ({ ...img })), // ⭐ 깊은 복사
-          ...newlyPickedImages.map((img) => ({ ...img })), // ⭐ 깊은 복사
-        ];
-
-        return {
-          ...prev,
-          [actionId]: combined.slice(0, 5),
-        };
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: false,
+        allowsEditing: false,
+        quality: 1,
       });
+
+      if (result.canceled || !result.assets) return;
+
+      const validAssets = result.assets;
+
+      const compressedAssets = await Promise.all(
+        validAssets.map(async (asset, index) => {
+          try {
+            const compressed = await ImageManipulator.manipulateAsync(
+              asset.uri,
+              [{ resize: { width: 800 } }],
+              { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG },
+            );
+            return {
+              ...asset,
+              uri: `${compressed.uri}?t=${Date.now()}_${index}`,
+            };
+          } catch (manipulateError) {
+            console.error('이미지 압축 에러:', manipulateError);
+            return asset;
+          }
+        }),
+      );
+
+      setActionImages((prev) => ({
+        ...prev,
+        [actionId]: [...(prev[actionId] || []), ...compressedAssets].slice(
+          0,
+          5,
+        ),
+      }));
+    } catch (error) {
+      Alert.alert('에러', '사진을 불러오는 중 문제가 발생했습니다.');
     }
   };
 

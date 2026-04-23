@@ -40,8 +40,11 @@ export default function CreateGroup() {
 
       if (groupItem.groupImageLink) {
         setSelectedImage({ uri: groupItem.groupImageLink } as any);
-        setIsImagePicked(false);
+      } else {
+        setSelectedImage(undefined);
       }
+
+      setIsImagePicked(false);
     }
   }, [groupItem, mode]);
 
@@ -49,22 +52,31 @@ export default function CreateGroup() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
-      quality: 1,
+      quality: 0.3,
     });
 
     if (!result.canceled) {
-      setSelectedImage(result.assets[0]);
+      const selectedAsset = result.assets[0];
+      const MAX_SIZE = 1 * 1024 * 1024;
+
+      if (selectedAsset.fileSize && selectedAsset.fileSize > MAX_SIZE) {
+        Alert.alert(
+          '용량 초과',
+          '1MB 이하의 사진만 업로드할 수 있습니다. 다른 사진을 선택하거나 사진을 편집해 주세요.',
+        );
+        return;
+      }
+
+      setSelectedImage(selectedAsset);
       setIsImagePicked(true);
     }
   };
 
-  const defaultImage = require('@/assets/images/default-group-image.png');
-
   const groupNickname = 'test12345';
 
-  const { mutate: updateGroup } = useUpdateGroup({
+  const { mutate: updateGroup, isPending: isUpdating } = useUpdateGroup({
     onSuccess: () => {
-      Alert.alert('성공', '그룹 수정이 성공했습니다.');
+      Alert.alert('성공', '그룹 수정을 성공했습니다.');
       router.back();
     },
     onError: (error) => {
@@ -79,7 +91,6 @@ export default function CreateGroup() {
       router.push('/(tabs)/group');
     },
     onError: (error) => {
-      console.error('에러:', error);
       alert('그룹 생성 오류: ' + error.message);
     },
   });
@@ -87,13 +98,12 @@ export default function CreateGroup() {
   const handleCreateGroup = async () => {
     const user = auth().currentUser;
     const freshToken = await user?.getIdToken();
-    if (!user) {
+
+    if (!user || !freshToken) {
+      Alert.alert('오류', '로그인 세션이 만료되었거나 유저 정보가 없습니다.');
       return;
     }
-    if (!freshToken) {
-      Alert.alert('오류', '로그인 세션이 만료되었습니다.');
-      return;
-    }
+
     if (mode === 'create' && groupName.trim() === '') {
       Alert.alert('그룹 명을 입력해 주세요.');
       return;
@@ -105,8 +115,13 @@ export default function CreateGroup() {
     }
 
     if (mode === 'edit') {
+      if (!groupId) {
+        Alert.alert('오류', '수정할 그룹의 ID를 찾을 수 없습니다.');
+        return;
+      }
+
       updateGroup({
-        groupId: groupId!,
+        groupId: groupId,
         token: freshToken,
         groupCertificationCriteria: 3,
         groupDescription,
@@ -124,10 +139,10 @@ export default function CreateGroup() {
         },
         {
           onSuccess: () => {
-            if (userSession) {
+            if (userSession && typeof userSession === 'object') {
               setLogin({
                 ...userSession,
-                token: freshToken || '',
+                token: freshToken,
               });
             }
           },
@@ -138,7 +153,7 @@ export default function CreateGroup() {
 
   return (
     <SafeAreaView>
-      <Loader visible={isPending} />
+      <Loader visible={isPending || isUpdating} />
       <View style={styles.container_top}>
         <Pressable style={styles.arrow_icon} onPress={() => router.back()}>
           <Feather name="arrow-left" size={32} color="black" />
@@ -161,7 +176,10 @@ export default function CreateGroup() {
 
       <Pressable onPress={pickImageAsync} style={styles.image_wrapper}>
         <View>
-          <GroupImage uri={groupItem?.groupImageLink} size={80} />
+          <GroupImage
+            uri={isImagePicked ? selectedImage?.uri : groupItem?.groupImageLink}
+            size={80}
+          />
         </View>
       </Pressable>
 
