@@ -36,26 +36,24 @@ export default function MyScreen() {
 
   const handleLogOut = () => {
     Alert.alert('로그아웃', '로그아웃 하시겠습니까?', [
-      {
-        text: '취소',
-        style: 'cancel',
-      },
+      { text: '취소', style: 'cancel' },
       {
         text: '확인',
         style: 'destructive',
         onPress: async () => {
           try {
             await GoogleSignin.signOut();
-
             await auth().signOut();
 
             queryClient.clear();
 
             router.replace('/auth/signIn');
+
+            setLogOut();
           } catch (error) {
             console.error('로그아웃 에러', error);
-            setLogOut();
             router.replace('/auth/signIn');
+            setLogOut();
           }
         },
       },
