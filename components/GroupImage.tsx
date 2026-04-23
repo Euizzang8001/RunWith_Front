@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   ImageProps,
@@ -21,6 +21,10 @@ export const GroupImage = ({
   ...props
 }: ProfileImageProps) => {
   const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    setIsError(false);
+  }, [uri]);
 
   const getSource = (): ImageSourcePropType => {
     if (

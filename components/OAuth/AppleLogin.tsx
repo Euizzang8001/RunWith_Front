@@ -14,7 +14,11 @@ import {
   signInWithCredential,
 } from '@react-native-firebase/auth';
 
-export default function AppleLogin() {
+interface AppleLoginProps {
+  setIsLoading: (val: boolean) => void;
+}
+
+export default function AppleLogin({ setIsLoading }: AppleLoginProps) {
   const { setLogin } = useAuthActions();
   const router = useRouter();
 
@@ -34,19 +38,18 @@ export default function AppleLogin() {
     if (runner.isExist) {
       if (!runnerInfo) return;
 
-      console.log(
-        '애플 로그인 러너 정보:',
-        JSON.stringify(runnerInfo, null, 2),
-      );
       setLogin({ ...runnerInfo, token: firebaseToken });
+      setIsLoading(false);
       router.replace('/(tabs)');
     } else {
+      setIsLoading(false);
       router.replace('/auth/profileSetting');
     }
   }, [runner, runnerInfo, firebaseToken]);
 
   const onAppleButtonPress = async () => {
     try {
+      setIsLoading(true);
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,

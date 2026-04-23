@@ -1,6 +1,6 @@
-import { ActionModal } from '@/components/Actions/ActionModal'; // 👈 ActionModal 임포트
+import { ActionModal } from '@/components/Actions/ActionModal';
 import { colors } from '@/constants';
-import { useGetActions } from '@/hooks/queries/actions/use-get-action'; // 👈 액션 상세 데이터를 가져올 훅 임포트
+import { useGetActions } from '@/hooks/queries/actions/use-get-action';
 import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
 import { useGetMySchedule } from '@/hooks/queries/schedule/use-get-my-schedule';
 import { useUserSession } from '@/store/useAuthStore';

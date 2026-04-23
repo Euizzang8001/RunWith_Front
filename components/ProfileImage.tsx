@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   ImageProps,
@@ -22,10 +22,14 @@ export const ProfileImage = ({
 }: ProfileImageProps) => {
   const [isError, setIsError] = useState(false);
 
+  useEffect(() => {
+    setIsError(false);
+  }, [uri]);
+
   const getSource = (): ImageSourcePropType => {
     if (
-      typeof uri !== 'string' ||
       !uri ||
+      typeof uri !== 'string' ||
       uri === 'null' ||
       uri === 'undefined' ||
       uri.trim() === '' ||
@@ -48,12 +52,14 @@ export const ProfileImage = ({
         {...props}
         source={getSource()}
         style={styles.image}
-        onError={() => setIsError(true)}
+        onError={() => {
+          console.log('이미지 로딩 에러:', uri);
+          setIsError(true);
+        }}
       />
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   wrapper: {
     overflow: 'hidden',

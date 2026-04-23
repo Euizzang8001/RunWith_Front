@@ -15,7 +15,11 @@ import {
   signInWithCredential,
 } from '@react-native-firebase/auth';
 
-export default function GoogleLogin() {
+interface GoogleLoginProps {
+  setIsLoading: (val: boolean) => void;
+}
+
+export default function GoogleLogin({ setIsLoading }: GoogleLoginProps) {
   const { setLogin } = useAuthActions();
   const router = useRouter();
 
@@ -39,16 +43,19 @@ export default function GoogleLogin() {
     if (runner.isExist) {
       if (!runnerInfo) return;
 
-      console.log('러너 정보:', JSON.stringify(runnerInfo, null, 2));
       setLogin({ ...runnerInfo, token: firebaseToken });
+      setIsLoading(false); // 로딩 상태
       router.replace('/(tabs)');
     } else {
+      setIsLoading(false); // 로딩 상태
       router.replace('/auth/profileSetting');
     }
   }, [runner, runnerInfo, firebaseToken]);
 
   const onGoogleButtonPress = async () => {
     try {
+      setIsLoading(true);
+
       await GoogleSignin.signOut().catch(() => {});
 
       const auth = getAuth();
@@ -68,6 +75,7 @@ export default function GoogleLogin() {
         console.log(token);
       }
     } catch (error) {
+      setIsLoading(false);
       console.error(error);
     }
   };

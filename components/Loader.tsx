@@ -7,10 +7,15 @@ type LoaderProps = {
 export default function Loader({ visible }: LoaderProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
-      <View>
-        <View>
-          <ActivityIndicator size="large" color={colors.BLUE} />
-        </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.3)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.BLUE} />
       </View>
     </Modal>
   );

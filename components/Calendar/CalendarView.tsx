@@ -61,11 +61,11 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
 
   const { mutate: deleteActions } = useDeleteActions({
     onSuccess: () => {
-      Alert.alert('액션 삭제 완료');
+      Alert.alert('일정 삭제 완료');
       setIsActionListModalOpen(false);
       setIsScheduleOpen(true);
     },
-    onError: (error) => Alert.alert('액션 삭제 오류', error.message),
+    onError: (error) => Alert.alert('일정 삭제 오류', error.message),
   });
 
   const { mutate: createActions } = UseCreateActions({
@@ -75,9 +75,9 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
       setStartTime('');
       setEndTime('');
       setIsActionModalOpen(false);
-      Alert.alert('액션 생성 완료');
+      Alert.alert('일정 생성 완료');
     },
-    onError: (error) => Alert.alert('액션 생성 오류', error.message),
+    onError: (error) => Alert.alert('일정 생성 오류', error.message),
   });
 
   const [selected, setSelected] = useState('');
@@ -161,7 +161,6 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
     if (!startTime || !endTime || !actionNameInput || !actionDescriptionInput)
       return Alert.alert('모든 정보를 입력해 주세요.');
 
-    // 정규식을 이용해 14:30 또는 1430 같은 입력을 시/분으로 추출
     const startMatch = startTime.replace(/[^0-9]/g, '');
     const endMatch = endTime.replace(/[^0-9]/g, '');
 
@@ -309,7 +308,7 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
               </View>
             )}
             ListEmptyComponent={
-              <Text style={styles.noSchedule}>액션이 없습니다.</Text>
+              <Text style={styles.noSchedule}>아직 일정이 없습니다.</Text>
             }
           />
         </View>
