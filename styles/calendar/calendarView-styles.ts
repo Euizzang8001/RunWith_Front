@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  // 일정 텍스트 영역 (버튼이 안 잘리게 영역 확보)
+
   schedule_text_wrapper: {
     flex: 1,
     marginRight: 10,
@@ -71,15 +71,15 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 20, // 간격 살짝 조정
+    paddingVertical: 20,
   },
   startTime: {
     backgroundColor: '#F1F3F5',
     flex: 1,
-    height: 54, // 높이를 줘서 더 안정감 있게
+    height: 54,
     borderRadius: 12,
-    justifyContent: 'center', // 세로 중앙
-    alignItems: 'center', // 가로 중앙
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textStartTime: {
     textAlign: 'center',
@@ -91,8 +91,8 @@ export const styles = StyleSheet.create({
     flex: 1,
     height: 54,
     borderRadius: 12,
-    justifyContent: 'center', // 세로 중앙
-    alignItems: 'center', // 가로 중앙
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textEndTime: {
     textAlign: 'center',

@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
     color: colors.RED,
   },
   sectionTitle: {
-    fontFamily: 'pretendard700', // 굵은 폰트 추천
+    fontFamily: 'pretendard700',
     fontSize: 18,
     color: '#333',
     marginBottom: 12,
