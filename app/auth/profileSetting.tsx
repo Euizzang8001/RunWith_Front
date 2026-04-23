@@ -4,9 +4,10 @@ import Loader from '@/components/Loader';
 import { ProfileImage } from '@/components/ProfileImage';
 import { useSignUp } from '@/hooks/mutations/auth/use-sign-up';
 import { useUpdateRunnersInfo } from '@/hooks/mutations/runners/use-update-runners-info';
-import { useAuthActions, useUserSession } from '@/store/useAuthStore';
+import { useAuthActions } from '@/store/useAuthStore';
 import { styles } from '@/styles/auth/profileSetting-styles';
 import auth from '@react-native-firebase/auth';
+import { useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
@@ -21,8 +22,8 @@ import {
 } from 'react-native';
 
 export default function NicknameSetting() {
-  const user = useUserSession();
   const { setLogin } = useAuthActions();
+  const queryClient = useQueryClient();
 
   const params = useLocalSearchParams<{
     mode?: string;
@@ -49,15 +50,7 @@ export default function NicknameSetting() {
   };
 
   // 회원가입
-  const { mutate: signUp, isPending } = useSignUp({
-    onSuccess: (data) => {
-      setLogin({
-        token: user?.token,
-        ...data,
-      });
-      Alert.alert('닉네임 설정 성공');
-      router.replace('/(tabs)');
-    },
+  const { mutate: signUp, isPending: isSignUpPending } = useSignUp({
     onError: (error) => {
       console.log('에러 상세 내용:', error);
       Alert.alert('닉네임 설정 실패', error.message);
@@ -65,12 +58,14 @@ export default function NicknameSetting() {
     },
   });
 
-  // 러너 수정 뮤테이션
-  const { mutate: updateRunner } = useUpdateRunnersInfo({
-    onError: (error) => {
-      Alert.alert('수정 실패', error.message);
-    },
-  });
+  const { mutate: updateRunner, isPending: isUpdateRunnerPending } =
+    useUpdateRunnersInfo({
+      onError: (error) => {
+        Alert.alert('수정 실패', error.message);
+      },
+    });
+
+  const isPending = isSignUpPending || isUpdateRunnerPending;
 
   const handleSignUp = async () => {
     if (runnerName.trim() === '') {
@@ -79,8 +74,7 @@ export default function NicknameSetting() {
     }
 
     try {
-      const firebaseUser = await auth().currentUser;
-
+      const firebaseUser = auth().currentUser;
       if (!firebaseUser) {
         Alert.alert('인증 정보가 만료되었습니다. 다시 로그인해 주세요.');
         router.replace('/auth/signIn');
@@ -88,38 +82,42 @@ export default function NicknameSetting() {
       }
 
       const token = await firebaseUser.getIdToken(true);
-      console.log(auth().currentUser);
-      console.log('보내는 토큰:', token);
-      console.log(typeof token);
+
       if (isEditMode) {
-        const runnerProfileImage = selectedImage
-          ? selectedImage
-          : params.prevRunnerImageLink
-            ? { uri: params.prevRunnerImageLink }
-            : undefined;
         updateRunner(
+          { runnerName, runnerImageLink: selectedImage ?? undefined, token },
           {
-            runnerName,
-            runnerImageLink: runnerProfileImage,
-            token,
-          },
-          {
-            onSuccess: (data) => {
-              setLogin({
-                token: token,
-                ...data,
+            onSuccess: async (data) => {
+              await queryClient.invalidateQueries({
+                queryKey: ['runner-info'],
               });
+              await queryClient.invalidateQueries({
+                queryKey: ['mine-groups'],
+              });
+
+              setLogin({ token, ...data });
               Alert.alert('수정 완료', '프로필이 변경되었습니다.');
               router.back();
             },
           },
         );
       } else {
-        signUp({
-          runnerName,
-          runnerImageLink: selectedImage,
-          token,
-        });
+        signUp(
+          { runnerName, runnerImageLink: selectedImage, token },
+          {
+            onSuccess: async (data) => {
+              await queryClient.clear();
+
+              setLogin({
+                token: token,
+                ...data,
+              });
+
+              Alert.alert('닉네임 설정 성공');
+              router.replace('/(tabs)');
+            },
+          },
+        );
       }
     } catch (error) {
       console.error('토큰 가져오기 실패:', error);
