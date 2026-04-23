@@ -17,14 +17,13 @@
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
       "bundleIdentifier": "com.dev.RunWith",
-      "scheme": "runwith",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "스케줄 인증 사진을 선택하고 편집하기 위해 앨범 접근 권한이 필요합니다.",
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSExceptionDomains": {
-            "DEV_API_URL": {
+            "13.125.26.132": {
               "NSExceptionAllowsInsecureHTTPLoads": true,
               "NSIncludesSubdomains": true
             }
