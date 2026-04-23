@@ -36,7 +36,6 @@ export const useAuthStore = create(
         },
         partialize: (state) => ({
           user: state.user,
-          isLoaded: state.isLoaded,
         }),
       },
     ),
