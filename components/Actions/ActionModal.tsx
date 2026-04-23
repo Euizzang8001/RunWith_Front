@@ -47,7 +47,6 @@ export const ActionModal = ({
     },
     onError: (error) => {
       Alert.alert('실패', `서버 업로드 오류 : ${error.message}`);
-      console.log('업로드 에러 상세:', error);
     },
   });
 

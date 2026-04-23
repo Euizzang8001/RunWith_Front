@@ -9,7 +9,7 @@ export async function joinRequest({
   token: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/join-requests`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests`,
     {
       method: 'POST',
       headers: {
@@ -21,7 +21,6 @@ export async function joinRequest({
   );
   if (!response.ok) {
     Alert.alert('가입 신청 에러');
-    console.log(response.status);
   }
   return response.json();
 }
@@ -35,7 +34,7 @@ export async function joinRequestReject({
   token: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/join-requests/${joinRequestId}/reject`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/${joinRequestId}/reject`,
     {
       method: 'POST',
       headers: {
@@ -47,7 +46,6 @@ export async function joinRequestReject({
   );
   if (!response.ok) {
     Alert.alert('가입 신청 거절 에러');
-    console.log(response.status);
   }
   return response.json();
 }
@@ -61,7 +59,7 @@ export async function joinRequestAccept({
   token: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/join-requests/${joinRequestId}/accept`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/${joinRequestId}/accept`,
     {
       method: 'POST',
       headers: {
@@ -73,7 +71,6 @@ export async function joinRequestAccept({
   );
   if (!response.ok) {
     Alert.alert('그룹 가입 신청 승인 에러');
-    console.log(response.status);
   }
   return response.json();
 }
@@ -87,7 +84,7 @@ export async function getJoinRequestList({
   token: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/join-requests/groups/${groupId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/groups/${groupId}`,
     {
       method: 'GET',
       headers: {
@@ -106,7 +103,7 @@ export async function getJoinRequestList({
 // 나의 그룹 신청 명단 보기
 export async function getMyJoinRequestList(token: string) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/join-requests/me`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/me`,
     {
       method: 'GET',
       headers: {
@@ -117,7 +114,6 @@ export async function getMyJoinRequestList(token: string) {
   );
   if (!response.ok) {
     Alert.alert('가입 신청 승인 에러');
-    console.log(response.status);
   }
   return response.json();
 }
@@ -131,7 +127,7 @@ export async function deleteJoinRequest({
   token: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/join-requests/${joinRequestId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/${joinRequestId}`,
     {
       method: 'DELETE',
       headers: {
@@ -142,7 +138,6 @@ export async function deleteJoinRequest({
   );
   if (!response.ok) {
     Alert.alert('그룹 가입 신청 삭제');
-    console.log(response.status);
   }
   return response.json();
 }

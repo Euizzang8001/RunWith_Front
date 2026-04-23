@@ -30,7 +30,7 @@ export async function signUp({
   }
 
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/runners`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners`,
     {
       method: 'POST',
       headers: {
@@ -49,7 +49,6 @@ export async function signUp({
     throw new Error('생성하고자 하는 데이터를 가진 러너들이 이미 존재합니다.');
   }
 
-  console.log(response.status);
   if (!response.ok) {
     throw new Error('프로필 설정 실패');
   }
@@ -59,7 +58,7 @@ export async function signUp({
 
 export async function signOut() {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/runners/logout`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/logout`,
     {
       method: 'POST',
       headers: {
@@ -77,7 +76,7 @@ export async function signOut() {
 // 러너 존재 여부 확인
 export async function getExistRunner(token: string) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/runners/me/exists`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/me/exists`,
     {
       method: 'GET',
       headers: {
@@ -111,7 +110,7 @@ export async function getExistRunner(token: string) {
 // 러너 조회
 export async function getRunnersInfo({ token }: { token: string }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/runners/me`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/me`,
     {
       method: 'GET',
       headers: {
@@ -157,7 +156,7 @@ export async function updateRunnersInfo({
   }
 
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/runners/me`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/me`,
     {
       method: 'PATCH',
       headers: {
@@ -176,7 +175,6 @@ export async function updateRunnersInfo({
     throw new Error('생성하고자 하는 데이터를 가진 러너들이 이미 존재합니다.');
   }
 
-  console.log(response.status);
   if (!response.ok) {
     throw new Error('프로필 수정 실패');
   }

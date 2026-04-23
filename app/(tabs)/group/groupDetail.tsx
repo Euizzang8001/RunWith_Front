@@ -59,9 +59,10 @@ export default function GroupDetail() {
   });
 
   const group = useMemo(() => {
-    const allGroups = [...groups];
+    if (!groups) return getSelfGroup || null;
 
-    const myGroup = groups?.find((item: GroupInfo) => item.groupId === groupId);
+    const allGroups = [...groups];
+    const myGroup = groups.find((item: GroupInfo) => item.groupId === groupId);
     if (myGroup) return myGroup;
 
     if (getSelfGroup) {
