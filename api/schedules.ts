@@ -3,7 +3,7 @@ export async function getSchedules(token: string, belongId?: string) {
   const queryString = belongId ? `belongId=${belongId}` : '';
 
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules?${queryString}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules?${queryString}`,
     {
       method: 'GET',
       headers: {
@@ -22,7 +22,7 @@ export async function getSchedules(token: string, belongId?: string) {
 // 내 스케줄 조회
 export async function getMySchedules(token: string) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules/me`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules/me`,
     {
       method: 'GET',
       headers: {
@@ -55,7 +55,7 @@ export async function createSchedules({
   scheduleDescription: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules`,
     {
       method: 'POST',
       headers: {
@@ -77,7 +77,6 @@ export async function createSchedules({
   }
 
   if (!response.ok) {
-    console.log('스케줄 생성 오류 코드', response.status);
     throw new Error('스케줄 생성');
   }
   return response.json();
@@ -92,7 +91,7 @@ export async function deleteSchedules({
   scheduleId: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules/${scheduleId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules/${scheduleId}`,
     {
       method: 'DELETE',
       headers: {
@@ -122,7 +121,7 @@ export async function updateSchedules({
   scheduleDescription: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/schedules/${scheduleId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules/${scheduleId}`,
     {
       method: 'PATCH',
       headers: {
@@ -136,7 +135,6 @@ export async function updateSchedules({
     },
   );
 
-  console.log('스케줄 수정 오류 코드', response.status);
   if (!response.ok) {
     throw new Error('스케줄 수정 오류');
   }

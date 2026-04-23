@@ -9,7 +9,7 @@ export async function postRecognizes({
   token: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/recognizes/${scheduleId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/recognizes/${scheduleId}`,
     {
       method: 'POST',
       headers: {

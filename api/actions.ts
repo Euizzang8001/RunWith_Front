@@ -7,7 +7,7 @@ export async function getActions({
   scheduleId: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/actions?scheduleId=${scheduleId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions?scheduleId=${scheduleId}`,
     {
       method: 'GET',
       headers: {
@@ -72,7 +72,7 @@ export async function createActions({
   } as any);
 
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/actions`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions`,
     {
       method: 'POST',
       headers: {
@@ -97,7 +97,7 @@ export async function getActionsDetail({
   actionId: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/actions/${actionId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions/${actionId}`,
     {
       method: 'GET',
       headers: {
@@ -123,7 +123,7 @@ export async function deleteActions({
   actionId: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/actions/${actionId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions/${actionId}`,
     {
       method: 'DELETE',
       headers: {
@@ -197,7 +197,7 @@ export async function updateActions({
   }
 
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/actions/${actionId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions/${actionId}`,
     {
       method: 'PATCH',
       headers: {

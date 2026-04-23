@@ -27,8 +27,7 @@ export async function createGroup({
       type: groupImageLink.mimeType || 'image/jpeg',
     } as any);
   }
-  console.log(groupImageLink);
-  console.log(formData);
+
   const data = {
     groupName,
     groupNickname,
@@ -42,7 +41,7 @@ export async function createGroup({
   } as any);
 
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups`,
     {
       method: 'POST',
       headers: {
@@ -61,7 +60,7 @@ export async function createGroup({
 // 그룹 조회
 export async function getGroups(token: string, groupName: string) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups?groupName=${groupName}&offset=0&limit=20`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups?groupName=${groupName}&offset=0&limit=20`,
     {
       method: 'GET',
       headers: {
@@ -85,7 +84,7 @@ export async function deleteGroup({
   token: string;
 }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups/${groupId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups/${groupId}`,
     {
       method: 'DELETE',
       headers: {
@@ -146,7 +145,7 @@ export async function updateGroup({
   }
   console.log('보내는 JSON 데이터:', JSON.stringify(Groupdata));
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups/${groupId}`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups/${groupId}`,
     {
       method: 'PATCH',
       headers: {
@@ -165,7 +164,7 @@ export async function updateGroup({
 // 내 그룹 보기
 export async function getSelfGroup({ token }: { token: string }) {
   const response = await fetch(
-    `${process.env.EXPO_PUBLIC_DEV_API_URL}/api/v1/groups/self`,
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups/self`,
     {
       method: 'GET',
       headers: {
