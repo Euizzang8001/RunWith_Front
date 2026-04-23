@@ -71,7 +71,6 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
   const { mutate: createActions } = UseCreateActions({
     onSuccess: () => {
       setActionNameInput('');
-      setActionDescriptionInput('');
       setStartTime('');
       setEndTime('');
       setIsActionModalOpen(false);
@@ -158,7 +157,7 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
   };
 
   const handleSaveAction = () => {
-    if (!startTime || !endTime || !actionNameInput || !actionDescriptionInput)
+    if (!startTime || !endTime || !actionNameInput)
       return Alert.alert('모든 정보를 입력해 주세요.');
 
     const startMatch = startTime.replace(/[^0-9]/g, '');
@@ -181,7 +180,7 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
       token: user?.token || '',
       scheduleId: targetScheduleId,
       actionName: actionNameInput,
-      actionDescription: actionDescriptionInput,
+      actionDescription: ' ',
       actionStartHour: startHour,
       actionStartMinute: startMinute,
       actionEndHour: endHour,
@@ -297,6 +296,7 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
               <View style={styles.schedule_card}>
                 <View style={styles.card_info}>
                   <Text>{item.actionName}</Text>
+                  <Text>{item.actionDescription}</Text>
                   <Text>
                     {item.actionStartHour}시 {item.actionStartMinute}분 ~{' '}
                     {item.actionEndHour}시 {item.actionEndMinute}분
@@ -366,11 +366,6 @@ export default function CalendarView({ belongId, runnerId }: ScheduleProps) {
                 label="할 일"
                 value={actionNameInput}
                 onChangeText={setActionNameInput}
-              />
-              <InputField
-                label="상세내용"
-                value={actionDescriptionInput}
-                onChangeText={setActionDescriptionInput}
               />
 
               {/* 시간 직접 입력 */}
