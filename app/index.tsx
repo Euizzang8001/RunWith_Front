@@ -1,3 +1,4 @@
+import Loader from '@/components/Loader';
 import { useAuthStore, useUserSession } from '@/store/useAuthStore';
 import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import { useRouter } from 'expo-router';
@@ -14,15 +15,23 @@ export default function Index() {
     if (!isLoaded) return;
 
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser && userSession?.runnerName) {
+      if (!currentUser) return;
+
+      if (userSession === undefined || userSession === null) {
+        return;
+      }
+
+      if (userSession.runnerName) {
         router.replace('/(tabs)');
-      } else if (currentUser && !userSession?.runnerName) {
+      } else {
         router.replace('/auth/profileSetting');
       }
     });
 
     return () => unsubscribe();
-  }, [userSession, isLoaded]);
+  }, [isLoaded, userSession]);
+
+  if (!isLoaded) return <Loader visible={true} />;
 
   return <LoginScreen />;
 }
