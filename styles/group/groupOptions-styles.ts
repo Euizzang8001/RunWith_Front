@@ -86,9 +86,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: colors.RED,
   },
+  selfGroupName: {
+    color: colors.BLACK,
+  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: '#fff', // ⭐️ 불투명한 흰색 배경으로 풀스크린 처리
+    backgroundColor: '#fff',
   },
   modalHeader: {
     flexDirection: 'row',
