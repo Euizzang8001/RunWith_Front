@@ -307,7 +307,7 @@ const ActionItem = ({
         >
           <Text style={styles.action_name}>{action.actionName}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            {/* ✅ 삭제 모드 토글 버튼 */}
+            {/* 삭제 모드 버튼 */}
             {totalCount > 0 && (
               <Pressable
                 onPress={toggleDeleteMode}
@@ -409,7 +409,7 @@ const ActionItem = ({
             </Pressable>
           ))}
 
-          {/* 로컬(미저장) 이미지 */}
+          {/* 로컬이미지 */}
           {localImages.map((img: any, index: number) => (
             <Pressable
               key={`local-${action.actionId}-${index}`}
@@ -452,7 +452,7 @@ const ActionItem = ({
             </Pressable>
           ))}
 
-          {/* 카메라 버튼 (삭제 모드에서는 숨김) */}
+          {/* 카메라 버튼*/}
           {!isDeleteMode && totalCount < 5 && (
             <Pressable onPress={handlePickImage} style={styles.camera_button}>
               <View style={styles.camera_icon_container}>
@@ -464,7 +464,7 @@ const ActionItem = ({
         </ScrollView>
       </View>
 
-      {/* 이미지 뷰어 모달 (기존과 동일) */}
+      {/* 이미지 뷰어 모달 */}
       <Modal
         visible={isViewerOpen}
         transparent={true}

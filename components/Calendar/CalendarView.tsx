@@ -16,7 +16,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Modal,
-  Platform, // 👈 플랫폼 구분을 위해 추가
+  Platform,
   Pressable,
   Text,
   View,

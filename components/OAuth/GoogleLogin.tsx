@@ -71,8 +71,6 @@ export default function GoogleLogin({ setIsLoading }: GoogleLoginProps) {
         const token = await getIdToken(userCredential.user, true);
 
         setFirebaseToken(token);
-
-        console.log(token);
       }
     } catch (error) {
       setIsLoading(false);
