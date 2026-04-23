@@ -8,6 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { setCustomText } from 'react-native-global-props';
 import 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -97,6 +98,7 @@ export default function RootLayout() {
           }}
         />
       </Stack>
+      <Toast />
     </QueryClientProvider>
   );
 }
