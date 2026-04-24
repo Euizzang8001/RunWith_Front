@@ -1,20 +1,22 @@
 import { ActionModal } from '@/components/Actions/ActionModal';
 import { colors } from '@/constants';
 import { useGetActions } from '@/hooks/queries/actions/use-get-action';
-import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data';
 import { useGetMySchedule } from '@/hooks/queries/schedule/use-get-my-schedule';
 import { useUserSession } from '@/store/useAuthStore';
-import { useActionsSchedules } from '@/store/useScheduleStore';
 import { Schedule } from '@/types';
+import * as ImageManipulator from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
 import { useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import FeedItem from './FeedItem';
 
 export default function FeedList() {
   const user = useUserSession();
-  const { data: groups } = useGetMineGroups(user?.token || '');
   const { data: mySchedules = [] } = useGetMySchedule(user?.token);
-  const { updateScheduleStore } = useActionsSchedules();
+
+  const [actionImages, setActionImages] = useState<
+    Record<string, ImagePicker.ImagePickerAsset[]>
+  >({});
 
   const [refreshing, setRefreshing] = useState(false);
   const [selecetdFeed, setSelectedFeed] = useState<Schedule | null>(null);
@@ -55,6 +57,65 @@ export default function FeedList() {
     setIsModalOpen(true);
   };
 
+  const pickActionImage = async (actionId: string) => {
+    try {
+      const currentImagesSnapshot = actionImages[actionId] || [];
+      if (currentImagesSnapshot.length >= 5) {
+        Alert.alert('알림', '사진은 최대 5장까지 등록 가능합니다.');
+        return;
+      }
+
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('권한 필요', '설정에서 사진 접근 권한을 허용해주세요.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: false,
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (result.canceled || !result.assets) return;
+
+      const validAssets = result.assets;
+
+      const compressedAssets = await Promise.all(
+        validAssets.map(async (asset, index) => {
+          try {
+            const compressed = await ImageManipulator.manipulateAsync(
+              asset.uri,
+              [{ resize: { width: 800 } }],
+              { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG },
+            );
+            return {
+              ...asset,
+              uri: `${compressed.uri}?t=${Date.now()}_${index}`,
+            };
+          } catch (manipulateError) {
+            console.error('이미지 압축 에러:', manipulateError);
+            return asset;
+          }
+        }),
+      );
+
+      setActionImages((prev) => ({
+        ...prev,
+        [actionId]: [...(prev[actionId] || []), ...compressedAssets].slice(
+          0,
+          5,
+        ),
+      }));
+    } catch (error) {
+      Alert.alert('에러', '사진을 불러오는 중 문제가 발생했습니다.');
+    }
+  };
+
+  const clearActionImages = () => setActionImages({});
+
   return (
     <View style={{ flex: 1 }}>
       <FlatList
@@ -87,9 +148,10 @@ export default function FeedList() {
         }}
         selectedSchedule={selecetdFeed}
         getActions={getActions}
-        actionImages={{}}
-        onPickImage={() => {}}
-        clearActionImages={() => {}}
+        actionImages={actionImages}
+        onPickImage={pickActionImage}
+        clearActionImages={clearActionImages}
+        isMe={true}
       />
     </View>
   );

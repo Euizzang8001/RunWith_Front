@@ -30,8 +30,6 @@ export default function GroupMemberItem({
         <View ref={sourceRef as any} collapsable={false}>
           <Pressable
             onPress={() => {
-              console.log(isLeader, isTargetLeader);
-
               if (isLeader && !isTargetLeader) {
                 setVisible(true);
               }

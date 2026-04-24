@@ -125,7 +125,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 15,
     marginBottom: 12,
-    // 그림자 설정
+
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -144,7 +144,7 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   acceptBtn: {
-    backgroundColor: '#3498db', // 연한 초록 배경
+    backgroundColor: '#3498db',
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 8,
@@ -152,10 +152,10 @@ export const styles = StyleSheet.create({
   acceptBtnText: {
     fontFamily: 'pretendard700',
     fontSize: 14,
-    color: '#ffffff', // 진한 초록 글씨
+    color: '#ffffff',
   },
   rejectBtn: {
-    backgroundColor: '#FFEBEE', // 연한 빨강 배경
+    backgroundColor: '#FFEBEE',
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 8,
@@ -163,7 +163,7 @@ export const styles = StyleSheet.create({
   rejectBtnText: {
     fontFamily: 'pretendard700',
     fontSize: 14,
-    color: '#C62828', // 진한 빨강 글씨
+    color: '#C62828',
   },
   emptyContainer: {
     alignItems: 'center',

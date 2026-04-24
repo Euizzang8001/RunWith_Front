@@ -17,6 +17,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Loader from '../Loader';
 
 interface ActionListModalProps {
   isVisible: boolean;
@@ -26,6 +27,7 @@ interface ActionListModalProps {
   actionImages: Record<string, ImagePicker.ImagePickerAsset[]>;
   onPickImage: (actionId: string) => void;
   clearActionImages: () => void;
+  isMe: boolean;
 }
 
 export const ActionModal = ({
@@ -36,6 +38,7 @@ export const ActionModal = ({
   actionImages,
   onPickImage,
   clearActionImages,
+  isMe,
 }: ActionListModalProps) => {
   const insets = useSafeAreaInsets();
   const user = useUserSession();
@@ -69,6 +72,8 @@ export const ActionModal = ({
           paddingBottom: insets.bottom,
         }}
       >
+        {isPending && <Loader visible={isPending} />}
+
         {selectedSchedule && (
           <View style={{ flex: 1 }}>
             <Text style={styles.modal_title}>
@@ -86,6 +91,7 @@ export const ActionModal = ({
                     onPickImage={() => onPickImage(action.actionId)}
                     updateActions={updateActions}
                     isPending={isPending}
+                    isMe={isMe}
                   />
                 ))
               ) : (
@@ -115,6 +121,7 @@ const ActionItem = ({
   updateActions,
   isPending,
   onDeleteServerImage,
+  isMe,
 }: any) => {
   const shouldFetchDetail =
     !action.actionImageLinks || action.actionImageLinks.length === 0;
@@ -307,7 +314,7 @@ const ActionItem = ({
           <Text style={styles.action_name}>{action.actionName}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             {/* 삭제 모드 버튼 */}
-            {totalCount > 0 && (
+            {isMe && totalCount > 0 && (
               <Pressable
                 onPress={toggleDeleteMode}
                 style={{
@@ -452,7 +459,7 @@ const ActionItem = ({
           ))}
 
           {/* 카메라 버튼*/}
-          {!isDeleteMode && totalCount < 5 && (
+          {isMe && !isDeleteMode && totalCount < 5 && (
             <Pressable onPress={handlePickImage} style={styles.camera_button}>
               <View style={styles.camera_icon_container}>
                 <Ionicons name="camera" size={24} color="#ADB5BD" />

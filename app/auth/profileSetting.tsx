@@ -52,7 +52,6 @@ export default function NicknameSetting() {
   // 회원가입
   const { mutate: signUp, isPending: isSignUpPending } = useSignUp({
     onError: (error) => {
-      console.log('에러 상세 내용:', error);
       Alert.alert('닉네임 설정 실패', error.message);
       router.replace('/auth/signIn');
     },

@@ -36,6 +36,7 @@ export default function GroupDetail() {
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
   const date = today.getDate();
+
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [actionImages, setActionImages] = useState<
@@ -201,6 +202,8 @@ export default function GroupDetail() {
     selectedMemberSchedule?.belongId,
   );
 
+  const isMe = selectedMemberSchedule?.runnerName === user?.runnerName;
+
   // 선택한 유저의 스케줄(그룹별)
   const selectedUserSchedules = useMemo(() => {
     if (!selectedUser || !getSchedule || !selectedMemberSchedule) return [];
@@ -287,8 +290,8 @@ export default function GroupDetail() {
             {selectedUserSchedules.length > 0 ? (
               selectedUserSchedules.map((schedule: Schedule) => {
                 // 내 일정은 인정 버튼 안 보이게 필터링
-                const isMe =
-                  selectedMemberSchedule?.runnerName === user?.runnerName;
+                // const isMe =
+                //   selectedMemberSchedule?.runnerName === user?.runnerName;
 
                 const isAlreadyRecognized = schedule.recognizedByMe;
 
@@ -378,6 +381,7 @@ export default function GroupDetail() {
           actionImages={actionImages}
           onPickImage={pickActionImage}
           clearActionImages={clearActionImages}
+          isMe={isMe}
         />
       }
     </SafeAreaView>
