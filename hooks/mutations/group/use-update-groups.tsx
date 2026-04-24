@@ -10,7 +10,6 @@ export function useUpdateGroup(callbacks?: UseMutaionCallback) {
     mutationFn: updateGroup,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.group.all });
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
 
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
