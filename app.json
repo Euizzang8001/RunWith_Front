@@ -13,6 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "buildNumber": "3",
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",
@@ -34,6 +35,7 @@
           {
             "CFBundleURLName": "Google Auth",
             "CFBundleURLSchemes": [
+              "runwith",
               "com.googleusercontent.apps.221570016133-b272m52e7sm8eua5j490leneliteg6h6"
             ]
           }
