@@ -24,7 +24,6 @@ export const styles = StyleSheet.create({
     width: 40,
   },
 
-  // 검색창 영역
   searchSection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -34,7 +33,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#EEE',
-    // 그림자
+
     elevation: 2,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
