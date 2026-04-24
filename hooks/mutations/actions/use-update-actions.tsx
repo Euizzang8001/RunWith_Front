@@ -11,6 +11,10 @@ export default function useUpdateActions(callbacks?: UseMutaionCallback) {
         queryKey: ['actions'],
       });
 
+      await queryClient.invalidateQueries({
+        queryKey: ['actionsDetail'],
+      });
+
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
     onError: (error) => {
