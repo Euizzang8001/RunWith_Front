@@ -53,7 +53,6 @@ export const ProfileImage = ({
         source={getSource()}
         style={styles.image}
         onError={() => {
-          console.log('이미지 로딩 에러:', uri);
           setIsError(true);
         }}
       />
