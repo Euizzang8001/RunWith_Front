@@ -2,14 +2,25 @@ import { useGetMineGroups } from '@/hooks/queries/group/use-get-mine-groups.data
 import { useGetSelfGroup } from '@/hooks/queries/group/use-get-self-group.data';
 import { useUserSession } from '@/store/useAuthStore';
 import { GroupInfo } from '@/types';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { FlatList } from 'react-native';
 import GroupItem from './GroupItem';
 
 export default function GroupList() {
   const user = useUserSession();
-  const { data: joinedGroups = [] } = useGetMineGroups(user?.token || '');
-  const { data: selfGroup } = useGetSelfGroup(user?.token || '');
+  const { data: joinedGroups = [], refetch: refetchJoinedGroups } =
+    useGetMineGroups(user?.token || '');
+  const { data: selfGroup, refetch: refetchSelfGroup } = useGetSelfGroup(
+    user?.token || '',
+  );
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await Promise.all([refetchJoinedGroups(), refetchSelfGroup()]);
+    setIsRefreshing(false);
+  }, [refetchJoinedGroups, refetchSelfGroup]);
 
   const Groups = useMemo(() => {
     const myGroups = selfGroup
@@ -35,7 +46,8 @@ export default function GroupList() {
       data={Groups}
       renderItem={({ item }) => <GroupItem group={item} />}
       keyExtractor={(item) => String(item.groupId)}
-      refreshing={false}
+      refreshing={isRefreshing}
+      onRefresh={handleRefresh}
     />
   );
 }
