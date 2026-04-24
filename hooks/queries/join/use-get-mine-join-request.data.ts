@@ -1,14 +1,16 @@
 import { getMyJoinRequestList } from '@/api/join';
-import { QUERY_KEYS } from '@/lib/constants';
-import { useAuthStore } from '@/store/useAuthStore';
+import auth from '@react-native-firebase/auth';
 import { useQuery } from '@tanstack/react-query';
 
 export function useGetMineRequestList(token: string) {
-  const { isLoaded } = useAuthStore();
   return useQuery({
-    queryKey: QUERY_KEYS.request.mineRequestList(token),
-    queryFn: () => getMyJoinRequestList(token),
-    enabled: !!token && token.length > 0 && isLoaded,
-    retry: false,
+    queryKey: ['mineRequestList'],
+    // 토큰 갱신
+    queryFn: async () => {
+      const freshToken = (await auth().currentUser?.getIdToken()) ?? token;
+      return getMyJoinRequestList(freshToken);
+    },
+    enabled: !!token,
+    retry: 1,
   });
 }
