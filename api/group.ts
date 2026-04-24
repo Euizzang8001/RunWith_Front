@@ -143,7 +143,7 @@ export async function updateGroup({
       type: groupImageLink.mimeType || 'image/png',
     } as any);
   }
-  console.log('보내는 JSON 데이터:', JSON.stringify(Groupdata));
+
   const response = await fetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups/${groupId}`,
     {
