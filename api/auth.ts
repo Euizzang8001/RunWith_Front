@@ -1,3 +1,5 @@
+import { authFetch } from './authfetch';
+
 // 러너 생성
 export async function signUp({
   token,
@@ -29,7 +31,7 @@ export async function signUp({
     } as any);
   }
 
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners`,
     {
       method: 'POST',
@@ -57,7 +59,7 @@ export async function signUp({
 }
 
 export async function signOut() {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/logout`,
     {
       method: 'POST',
@@ -75,7 +77,7 @@ export async function signOut() {
 
 // 러너 존재 여부 확인
 export async function getExistRunner(token: string) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/me/exists`,
     {
       method: 'GET',
@@ -109,7 +111,7 @@ export async function getExistRunner(token: string) {
 
 // 러너 조회
 export async function getRunnersInfo({ token }: { token: string }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/me`,
     {
       method: 'GET',
@@ -155,7 +157,7 @@ export async function updateRunnersInfo({
     } as any);
   }
 
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/me`,
     {
       method: 'PATCH',

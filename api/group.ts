@@ -1,4 +1,5 @@
 import { Alert } from 'react-native';
+import { authFetch } from './authfetch';
 
 // 그룹 생성
 export async function createGroup({
@@ -40,7 +41,7 @@ export async function createGroup({
     type: 'application/json',
   } as any);
 
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups`,
     {
       method: 'POST',
@@ -59,7 +60,7 @@ export async function createGroup({
 
 // 그룹 조회
 export async function getGroups(token: string, groupName: string) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups?groupName=${groupName}&offset=0&limit=20`,
     {
       method: 'GET',
@@ -83,7 +84,7 @@ export async function deleteGroup({
   groupId: string;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups/${groupId}`,
     {
       method: 'DELETE',
@@ -144,7 +145,7 @@ export async function updateGroup({
     } as any);
   }
 
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups/${groupId}`,
     {
       method: 'PATCH',
@@ -163,7 +164,7 @@ export async function updateGroup({
 
 // 내 그룹 보기
 export async function getSelfGroup({ token }: { token: string }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/groups/self`,
     {
       method: 'GET',
