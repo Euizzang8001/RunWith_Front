@@ -1,4 +1,5 @@
 import { Alert } from 'react-native';
+import { authFetch } from './authfetch';
 
 // 그룹 가입 신청
 export async function joinRequest({
@@ -8,7 +9,7 @@ export async function joinRequest({
   groupId: string;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests`,
     {
       method: 'POST',
@@ -33,7 +34,7 @@ export async function joinRequestReject({
   joinRequestId: string;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/${joinRequestId}/reject`,
     {
       method: 'POST',
@@ -58,7 +59,7 @@ export async function joinRequestAccept({
   joinRequestId: string;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/${joinRequestId}/accept`,
     {
       method: 'POST',
@@ -83,7 +84,7 @@ export async function getJoinRequestList({
   groupId: string;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/groups/${groupId}`,
     {
       method: 'GET',
@@ -102,7 +103,7 @@ export async function getJoinRequestList({
 
 // 나의 그룹 신청 명단 보기
 export async function getMyJoinRequestList(token: string) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/me`,
     {
       method: 'GET',
@@ -126,7 +127,7 @@ export async function deleteJoinRequest({
   joinRequestId: string;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/join-requests/${joinRequestId}`,
     {
       method: 'DELETE',

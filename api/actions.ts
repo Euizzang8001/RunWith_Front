@@ -1,3 +1,5 @@
+import { authFetch } from './authfetch';
+
 // 액션 조회
 export async function getActions({
   token,
@@ -6,7 +8,7 @@ export async function getActions({
   token: string;
   scheduleId: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions?scheduleId=${scheduleId}`,
     {
       method: 'GET',
@@ -71,7 +73,7 @@ export async function createActions({
     type: 'application/json',
   } as any);
 
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions`,
     {
       method: 'POST',
@@ -96,7 +98,7 @@ export async function getActionsDetail({
   token: string;
   actionId: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions/${actionId}`,
     {
       method: 'GET',
@@ -122,7 +124,7 @@ export async function deleteActions({
   token: string;
   actionId: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions/${actionId}`,
     {
       method: 'DELETE',
@@ -196,7 +198,7 @@ export async function updateActions({
     }
   }
 
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/actions/${actionId}`,
     {
       method: 'PATCH',

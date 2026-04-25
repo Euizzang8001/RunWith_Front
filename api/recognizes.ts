@@ -1,3 +1,5 @@
+import { authFetch } from './authfetch';
+
 // 인정 api
 export async function postRecognizes({
   scheduleId,
@@ -8,7 +10,7 @@ export async function postRecognizes({
   recognizing: boolean;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/recognizes/${scheduleId}`,
     {
       method: 'POST',

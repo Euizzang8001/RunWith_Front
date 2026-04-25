@@ -13,7 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "buildNumber": "3",
+      "buildNumber": "5",
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "googleServicesFile": "./GoogleService-Info.plist",

@@ -1,8 +1,10 @@
+import { authFetch } from './authfetch';
+
 // 스케줄 조회
 export async function getSchedules(token: string, belongId?: string) {
   const queryString = belongId ? `belongId=${belongId}` : '';
 
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules?${queryString}`,
     {
       method: 'GET',
@@ -21,7 +23,7 @@ export async function getSchedules(token: string, belongId?: string) {
 
 // 내 스케줄 조회
 export async function getMySchedules(token: string) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules/me`,
     {
       method: 'GET',
@@ -54,7 +56,7 @@ export async function createSchedules({
   scheduleDate: number;
   scheduleDescription: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules`,
     {
       method: 'POST',
@@ -90,7 +92,7 @@ export async function deleteSchedules({
   token: string;
   scheduleId: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules/${scheduleId}`,
     {
       method: 'DELETE',
@@ -120,7 +122,7 @@ export async function updateSchedules({
   scheduleId: string;
   scheduleDescription: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/schedules/${scheduleId}`,
     {
       method: 'PATCH',

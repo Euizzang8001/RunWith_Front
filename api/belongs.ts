@@ -1,3 +1,5 @@
+import { authFetch } from './authfetch';
+
 // 그룹 가입하기
 export async function joinGroup({
   token,
@@ -12,7 +14,7 @@ export async function joinGroup({
   belongNickname: string;
   isLeader: boolean;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/belongs`,
     {
       method: 'POST',
@@ -43,7 +45,7 @@ export async function quitGroup({
   token: string;
   groupId: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/belongs/groups/${groupId}`,
     {
       method: 'DELETE',
@@ -70,7 +72,7 @@ export async function updateLeader({
   groupId: string;
   newLeaderRunnerId: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/belongs/leader`,
     {
       method: 'PATCH',
@@ -90,7 +92,7 @@ export async function updateLeader({
 
 // 특정 그룹에 속한 모든 러너 조회
 export async function getRunnerInGroups(groupId: string, token: string) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/belongs/groups/${groupId}`,
     {
       method: 'GET',
@@ -114,7 +116,7 @@ export async function getRunnerGroup({
   runnerId: string;
   token: string;
 }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/belongs/runners/${runnerId}`,
     {
       method: 'GET',
@@ -132,7 +134,7 @@ export async function getRunnerGroup({
 
 // 내가 속한 그룹 조회
 export async function getMineGroups({ token }: { token: string }) {
-  const response = await fetch(
+  const response = await authFetch(
     `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/belongs/me`,
     {
       method: 'GET',
