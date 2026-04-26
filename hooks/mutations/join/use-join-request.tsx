@@ -13,6 +13,10 @@ export function useJoinRequest(callbacks?: UseMutaionCallback) {
         queryKey: QUERY_KEYS.request.all,
       });
 
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.group.all,
+      });
+
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
     onError: (error) => {
