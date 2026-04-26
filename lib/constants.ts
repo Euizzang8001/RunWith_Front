@@ -26,6 +26,7 @@ export const QUERY_KEYS = {
     ) => ['group', 'leader', token, groupId, newLeaderRunnerId],
   },
   auth: {
+    all: ['runner'],
     existRunner: (token?: string) => ['auth', 'existRunner', token],
     runnerInfo: () => ['runner', 'runnerInfo'],
   },

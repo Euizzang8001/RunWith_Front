@@ -183,3 +183,33 @@ export async function updateRunnersInfo({
 
   return response.json();
 }
+
+// 러너 삭제
+export async function deleteRunner(token: string) {
+  const response = await fetch(
+    `${process.env.EXPO_PUBLIC_PROD_API_URL}/api/v1/runners/me`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  console.log(response.status);
+
+  if (!response.ok) {
+    throw new Error('러너 삭제 오류');
+  }
+
+  const contentType = response.headers.get('content-type');
+
+  if (
+    response.status === 204 ||
+    !contentType ||
+    !contentType.includes('application/json')
+  ) {
+    return { success: true };
+  }
+
+  return response.json();
+}

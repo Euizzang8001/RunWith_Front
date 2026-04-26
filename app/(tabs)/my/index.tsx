@@ -1,4 +1,5 @@
 import { ProfileImage } from '@/components/ProfileImage';
+import { useDeleteRunner } from '@/hooks/mutations/auth/use-delete-runner';
 import { useGetMineRequestList } from '@/hooks/queries/join/use-get-mine-join-request.data';
 import {
   useAuthActions,
@@ -20,6 +21,34 @@ export default function MyScreen() {
   const queryClient = useQueryClient();
 
   const { data: mineRequestGroup } = useGetMineRequestList(user?.token || '');
+
+  const { mutate: deleteRunner, isPending: isDeleteRunner } = useDeleteRunner({
+    onSuccess: async (data) => {
+      try {
+        // 1. 구글 세션 정리
+        const googleUser = await GoogleSignin.getCurrentUser();
+        if (googleUser) {
+          await GoogleSignin.revokeAccess();
+          await GoogleSignin.signOut();
+        }
+        await auth().signOut();
+      } catch (error) {
+        Alert.alert('소셜 세션 정리 오류');
+      }
+
+      setLogOut();
+      queryClient.clear();
+
+      Alert.alert('탈퇴 완료', '그동안 이용해 주셔서 감사합니다.', [
+        { text: '확인', onPress: () => router.replace('/auth/signIn') },
+      ]);
+    },
+    onError: (error: any) => {
+      console.error('탈퇴 에러 상세:', error);
+      Alert.alert('탈퇴 실패', error.message || '다시 시도해주세요.');
+    },
+  });
+
   const handleEditNickname = () => {
     router.push({
       pathname: '/auth/profileSetting',
@@ -30,6 +59,27 @@ export default function MyScreen() {
       },
     });
   };
+
+  const handleDeleteRunner = () => {
+    if (!user?.token) return;
+
+    Alert.alert(
+      '계정 탈퇴',
+      '정말로 탈퇴하시겠습니까? 모든 데이터가 삭제되며 복구할 수 없습니다.',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '확인',
+          style: 'destructive',
+          onPress: () => {
+            deleteRunner(user.token);
+          },
+        },
+      ],
+    );
+  };
+
+  console.log(user?.token);
 
   const isLoaded = useAuthStore((s) => s.isLoaded);
   if (!isLoaded) return null;
@@ -106,6 +156,13 @@ export default function MyScreen() {
         <View style={styles.setting_container}>
           <Pressable style={styles.logOut} onPress={handleLogOut}>
             <Text style={styles.logOut_text}>로그아웃</Text>
+          </Pressable>
+          <Pressable
+            style={styles.logOut}
+            onPress={handleDeleteRunner}
+            disabled={isDeleteRunner}
+          >
+            <Text style={styles.logOut_text}>계정 탈퇴</Text>
           </Pressable>
         </View>
       </View>
