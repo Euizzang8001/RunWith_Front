@@ -3,7 +3,7 @@ import { useGetSelfGroup } from '@/hooks/queries/group/use-get-self-group.data';
 import { useUserSession } from '@/store/useAuthStore';
 import { GroupInfo } from '@/types';
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 import GroupItem from './GroupItem';
 
 export default function GroupList() {
@@ -42,12 +42,15 @@ export default function GroupList() {
   }, [joinedGroups, selfGroup]);
 
   return (
-    <FlatList
-      data={Groups}
-      renderItem={({ item }) => <GroupItem group={item} />}
-      keyExtractor={(item) => String(item.groupId)}
-      refreshing={isRefreshing}
-      onRefresh={handleRefresh}
-    />
+    <View style={{ flex: 1 }}>
+      <FlatList
+        data={Groups}
+        renderItem={({ item }) => <GroupItem group={item} />}
+        keyExtractor={(item) => String(item.groupId)}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
+        contentContainerStyle={{ flexGrow: 1 }}
+      />
+    </View>
   );
 }

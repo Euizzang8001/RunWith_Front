@@ -10,7 +10,7 @@ export default function GroupTab() {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container_top}>
         <Text style={styles.header}>스터디 그룹</Text>
       </View>
@@ -38,5 +38,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingRight: 30,
+    paddingBottom: 10,
   },
 });
