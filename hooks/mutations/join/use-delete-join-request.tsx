@@ -13,6 +13,10 @@ export function useDeleteJoinRequest(callbacks?: UseMutaionCallback) {
         queryKey: QUERY_KEYS.request.all,
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ['request', 'mine'],
+      });
+
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
     onError: (error) => {

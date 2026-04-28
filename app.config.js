@@ -41,7 +41,7 @@ export default ({ config }) => {
             NSAllowsArbitraryLoads: true,
             NSExceptionDomains: {
               [apiHost]: {
-                NSExceptionAllowsInsecureHTTPLoads: true,
+                // NSExceptionAllowsInsecureHTTPLoads: true,
                 NSIncludesSubdomains: true,
               },
             },

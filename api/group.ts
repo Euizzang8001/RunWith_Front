@@ -96,9 +96,14 @@ export async function deleteGroup({
   );
 
   if (response.status === 401) {
-    Alert.alert('스케줄이 남아있어 그룹 삭제가 불가능합니다.');
+    Alert.alert('스케줄이 남아있어 삭제가 불가능합니다.');
   }
 
+  if (response.status === 500) {
+    Alert.alert(
+      '멤버가 남아있어 삭제가 불가능합니다. 리더를 변경 후 탈퇴해 주세요.',
+    );
+  }
   if (!response.ok) {
     const error = new Error('그룹 삭제 실패');
     (error as any).status = response.status;

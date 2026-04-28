@@ -16,6 +16,11 @@ export function useAccpetJoinRequest(callbacks?: UseMutaionCallback) {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.group.all,
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ['request', 'mine'],
+      });
+
       if (callbacks?.onSuccess) callbacks.onSuccess(data);
     },
     onError: (error) => {
