@@ -47,15 +47,23 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   setting_container: {
-    bottom: 0,
+    marginTop: 20,
+
+    borderColor: colors.GRAY_FONT,
+    borderTopWidth: 0.3,
   },
   logOut: {
     padding: 16,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   logOut_text: {
+    fontFamily: 'pretendard400',
     textAlign: 'left',
     color: colors.RED,
   },
+
   sectionTitle: {
     fontFamily: 'pretendard700',
     fontSize: 18,
