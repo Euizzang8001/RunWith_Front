@@ -71,14 +71,15 @@ export default function AppleLogin({ setIsLoading }: AppleLoginProps) {
         if (userCredential.user) {
           const token = await getIdToken(userCredential.user, true);
           setFirebaseToken(token);
-          console.log('Apple Firebase Token:', token);
         }
       }
-    } catch (e: any) {
-      if (e.code === 'ERR_REQUEST_CANCELED') {
+    } catch (error: any) {
+      if (error.code === 'ERR_REQUEST_CANCELED') {
       } else {
-        console.error('Apple Login Error:', e);
+        console.error('Apple Login Error:', error);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
