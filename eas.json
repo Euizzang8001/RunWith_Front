@@ -2,14 +2,27 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "development"
+      }
     },
     "release": {
-      "distribution": "store"
+      "distribution": "store",
+      "env": {
+        "APP_VARIANT": "production"
+      }
     },
     "review": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "development"
+      }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "APP_VARIANT": "production"
+      }
+    }
   }
 }
