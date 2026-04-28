@@ -168,7 +168,7 @@ export default function CreateGroup() {
               onPress={() => router.push('/(tabs)/group/joinGroup')}
               style={styles.participate}
             >
-              <Text>그룹 참여</Text>
+              <Text style={{ fontFamily: 'pretendard400' }}>그룹 참여</Text>
             </Pressable>
           )}
         </View>
